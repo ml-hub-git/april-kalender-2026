@@ -3,19 +3,25 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#ffffff">
 <title>April 2026 Kalender – Zähler</title>
 
-<!-- ======================================================
-     ALLES IN EINER DATEI (GitHub Pages READY)
-     ====================================================== -->
 <style>
+:root {
+    color-scheme: light;
+}
 
-/* Grundlayout – mobil optimiert */
+/* Grundlayout – helles Design erzwingen */
 body {
     margin: 0;
     font-family: Arial, Helvetica, sans-serif;
-    background: #f4f6f8;
+    background: #ffffff;
+    color: #111111;
     padding: 12px;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
 }
 
 h1 {
@@ -27,19 +33,17 @@ h1 {
 .container {
     max-width: 700px;
     margin: auto;
-    background: white;
+    background: #ffffff;
     padding: 12px;
     border-radius: 12px;
 }
 
-/* Kalender-Gitter */
 .calendar {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
     gap: 6px;
 }
 
-/* Wochentage */
 .weekday {
     text-align: center;
     font-weight: bold;
@@ -49,10 +53,9 @@ h1 {
     border-radius: 6px;
 }
 
-/* Tagesfeld (groß und mobilfreundlich) */
 .day {
     min-height: 85px;
-    background: #fafafa;
+    background: #f7f7f7;
     border-radius: 10px;
     border: 1px solid #e1e5ea;
     padding: 6px;
@@ -62,33 +65,29 @@ h1 {
     touch-action: manipulation;
 }
 
-/* Tagesnummer */
 .date-number {
     font-size: 11px;
     color: #666;
     text-align: right;
 }
 
-/* Zähler (gut lesbar auf Handy) */
 .counter {
     font-size: 30px;
     font-weight: bold;
     text-align: center;
+    color: #111111;
 }
 
-/* Farbregeln */
 .level-1 { background: #ef4444; color: white; }
 .level-2 { background: #f97316; color: white; }
-.level-3 { background: #facc15; }
+.level-3 { background: #facc15; color: #111111; }
 .level-4 { background: #22c55e; color: white; }
 
-/* Leere Felder vor dem 1. April */
 .empty {
     background: transparent;
     border: none;
 }
 
-/* Großer Button (WhatsApp‑freundlich) */
 .actions {
     margin-top: 15px;
     text-align: center;
@@ -114,15 +113,12 @@ button:active {
     font-size: 12px;
     color: #666;
 }
-
 </style>
 </head>
 <body>
 
 <div class="container">
-
 <h1>April 2026</h1>
-
 <div class="calendar" id="calendar">
     <div class="weekday">Mo</div>
     <div class="weekday">Di</div>
@@ -132,85 +128,60 @@ button:active {
     <div class="weekday">Sa</div>
     <div class="weekday">So</div>
 </div>
-
 <div class="actions">
     <button onclick="copyLink()">Link mit meinem aktuellen Stand kopieren</button>
     <div class="info">Der Link enthält alle Werte und funktioniert auch über WhatsApp.</div>
 </div>
-
 </div>
 
-
 <script>
-
-/* ======================================================
-   BASISDATEN
-   ====================================================== */
-
 const DAYS = 30;
-const START_DAY = 2; // 1. April 2026 = Mittwoch (Mo=0, Di=1, Mi=2)
-
+const START_DAY = 2;
 let counters = {};
-let longPressTimer = null;
 
-
-/* ======================================================
-   URL WERTE LADEN
-   ====================================================== */
-
-function loadFromURL() {
+function loadFromUrl() {
     const params = new URLSearchParams(window.location.search);
-
     for (let i = 1; i <= DAYS; i++) {
         const v = params.get("d" + i);
         counters[i] = v !== null && !isNaN(v) ? Math.max(0, parseInt(v)) : 0;
     }
 }
 
-
-/* ======================================================
-   KALENDER ERZEUGEN
-   ====================================================== */
-
 function createCalendar() {
     const calendar = document.getElementById("calendar");
-
-    // Leere Felder vor dem 1. April
     for (let i = 0; i < START_DAY; i++) {
         const empty = document.createElement("div");
         empty.className = "day empty";
         calendar.appendChild(empty);
     }
 
-    // Tage erzeugen
     for (let d = 1; d <= DAYS; d++) {
-
         const day = document.createElement("div");
         day.className = "day";
         day.dataset.day = d;
 
-        /* ============================
-           Klick = +1
-           ============================ */
-        day.addEventListener("click", () => increase(d));
+        let longPressFired = false;
+        let timer = null;
 
-        /* ============================
-           Rechtsklick = -1 (Desktop)
-           ============================ */
-        day.addEventListener("contextmenu", (e) => {
-            e.preventDefault();
-            decrease(d);
+        day.addEventListener("pointerdown", (e) => {
+            longPressFired = false;
+            timer = setTimeout(() => {
+                decrement(d);
+                longPressFired = true;
+            }, 500);
+        }, {passive: false});
+
+        day.addEventListener("pointerup", (e) => {
+            clearTimeout(timer);
+            if (!longPressFired && e.pointerType !== 'mouse') increment(d);
         });
 
-        /* ============================
-           Langes Drücken = -1 (Handy)
-           ============================ */
-        day.addEventListener("touchstart", () => {
-            longPressTimer = setTimeout(() => decrease(d), 600);
-        });
+        day.addEventListener("pointercancel", () => clearTimeout(timer));
+        day.addEventListener("contextmenu", e => e.preventDefault());
 
-        day.addEventListener("touchend", () => clearTimeout(longPressTimer));
-        day.addEventListener("touchmove", () => clearTimeout(longPressTimer));
+        if ('ontouchstart' in window === false) {
+            day.addEventListener("click", () => increment(d));
+        }
 
         const date = document.createElement("div");
         date.className = "date-number";
@@ -225,87 +196,46 @@ function createCalendar() {
         day.appendChild(counter);
         calendar.appendChild(day);
 
-        updateColor(d);
+        applyLevelClass(d, counters[d]);
     }
 }
 
-
-/* ======================================================
-   WERT +1
-   ====================================================== */
-
-function increase(day) {
+function increment(day) {
     counters[day]++;
     update(day);
 }
 
-
-/* ======================================================
-   WERT -1 (nicht unter 0)
-   ====================================================== */
-
-function decrease(day) {
+function decrement(day) {
     counters[day] = Math.max(0, counters[day] - 1);
     update(day);
 }
 
-
-/* ======================================================
-   ANZEIGE + FARBE AKTUALISIEREN
-   ====================================================== */
-
 function update(day) {
     document.getElementById("c" + day).textContent = counters[day];
-    updateColor(day);
+    applyLevelClass(day, counters[day]);
 }
 
-
-/* ======================================================
-   FARBE JE NACH WERT
-   ====================================================== */
-
-function updateColor(day) {
+function applyLevelClass(day, value) {
     const el = document.querySelector(`[data-day='${day}']`);
-
     el.classList.remove("level-1","level-2","level-3","level-4");
-
-    const v = counters[day];
-
-    if (v === 1) el.classList.add("level-1");
-    else if (v === 2) el.classList.add("level-2");
-    else if (v === 3) el.classList.add("level-3");
-    else if (v >= 4) el.classList.add("level-4");
+    if (value === 1) el.classList.add("level-1");
+    else if (value === 2) el.classList.add("level-2");
+    else if (value === 3) el.classList.add("level-3");
+    else if (value >= 4) el.classList.add("level-4");
 }
 
-
-/* ======================================================
-   URL MIT ALLEN WERTEN ERZEUGEN
-   ====================================================== */
-
-function buildURL() {
+function buildShareUrl() {
     const base = window.location.origin + window.location.pathname;
     const params = new URLSearchParams();
-
-    for (let i = 1; i <= DAYS; i++) {
-        params.set("d" + i, counters[i]);
-    }
-
+    for (let i = 1; i <= DAYS; i++) params.set("d" + i, counters[i]);
     return base + "?" + params.toString();
 }
 
-
-/* ======================================================
-   LINK IN ZWISCHENABLAGE KOPIEREN
-   FUNKTIONIERT AUCH AUF SMARTPHONES
-   ====================================================== */
-
 function copyLink() {
-    const url = buildURL();
-
+    const url = buildShareUrl();
     if (navigator.clipboard) {
         navigator.clipboard.writeText(url).then(() => alert("Link kopiert"));
     } else {
-        // Fallback für ältere Smartphones
         const input = document.createElement("input");
         input.value = url;
         document.body.appendChild(input);
@@ -316,14 +246,8 @@ function copyLink() {
     }
 }
 
-
-/* ======================================================
-   START
-   ====================================================== */
-
-loadFromURL();
+loadFromUrl();
 createCalendar();
-
 </script>
 
 </body>
