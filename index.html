@@ -6,117 +6,469 @@
   <title>Skat Trainer</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+  <style>
+:root {
+  --felt:      #0f4a29;
+  --felt-dark: #0a2e18;
+  --gold:      #c9a227;
+  --gold-l:    #e0ba50;
+  --gold-dim:  rgba(201,162,39,0.22);
+  --card-bg:   #fefcf5;
+  --card-bdr:  #d6cca8;
+  --red:       #c0392b;
+  --bsuit:     #1a1a2e;
+  --text:      #f0ead6;
+  --muted:     #98906e;
+  --ok:        #2ecc71;
+  --err:       #e74c3c;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:'Lato',sans-serif;
+  background:var(--felt-dark);
+  background-image:
+    radial-gradient(ellipse 80% 40% at 50% 0%,#1d6b42 0%,transparent 60%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='6' height='6'%3E%3Ccircle cx='1' cy='1' r='.6' fill='rgba(255,255,255,.025)'/%3E%3C/svg%3E");
+  color:var(--text);min-height:100vh;padding-bottom:40px
+}
+.container{max-width:560px;margin:0 auto;padding:16px 14px;display:flex;flex-direction:column;gap:14px}
+
+/* Header */
+.header{text-align:center}
+.title{font-family:'Playfair Display',serif;font-size:clamp(1.3rem,5.5vw,1.9rem);font-weight:900;color:var(--gold);letter-spacing:5px;text-shadow:0 0 20px rgba(201,162,39,.35),0 2px 6px rgba(0,0,0,.5);margin-bottom:12px}
+.stats-row{display:flex;justify-content:center;gap:6px;flex-wrap:wrap}
+.stat{background:rgba(255,255,255,.05);border:1px solid var(--gold-dim);border-radius:8px;padding:5px 10px;min-width:64px;text-align:center}
+.stat-label{font-size:.58rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-bottom:2px}
+.stat-value{font-size:.88rem;font-weight:700;color:var(--gold);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* Score panel */
+.score-panel{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:14px 12px}
+.party-score{display:flex;flex-direction:column;gap:7px}
+.party-name{font-family:'Playfair Display',serif;font-size:.72rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-bottom:2px}
+.score-row{display:flex;align-items:center;gap:6px}
+.score-label{font-size:.65rem;color:var(--muted);text-transform:uppercase;flex-shrink:0;min-width:56px}
+.score-input{width:60px;padding:7px 6px;background:rgba(255,255,255,.09);border:1px solid rgba(201,162,39,.3);border-radius:6px;color:var(--text);font-family:'Lato',sans-serif;font-size:1.05rem;font-weight:700;text-align:center;-moz-appearance:textfield;transition:border-color .2s,background .2s}
+.score-input::-webkit-inner-spin-button,.score-input::-webkit-outer-spin-button{-webkit-appearance:none}
+.score-input:focus{outline:none;border-color:var(--gold);background:rgba(255,255,255,.14)}
+.score-input:disabled{opacity:.5;cursor:not-allowed}
+.actual-value{font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:700;color:var(--gold);min-width:28px;text-align:center;transition:color .3s}
+.actual-value.correct{color:var(--ok)}
+.actual-value.wrong{color:var(--err)}
+
+/* Skat divider */
+.skat-divider{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:0 8px;border-left:1px solid rgba(255,255,255,.07);border-right:1px solid rgba(255,255,255,.07)}
+.skat-title{font-size:.6rem;letter-spacing:2.5px;text-transform:uppercase;color:var(--muted)}
+.skat-cards{display:flex;gap:4px}
+.skat-punkte{font-size:.68rem;color:var(--muted);white-space:nowrap}
+.card-back{width:30px;height:44px;background:repeating-linear-gradient(45deg,#1a5c35,#1a5c35 3px,#1d6b3e 3px,#1d6b3e 6px);border:1px solid rgba(255,255,255,.15);border-radius:4px;box-shadow:1px 1px 4px rgba(0,0,0,.3);opacity:.6}
+
+/* Spieltisch */
+.game-table{display:flex;align-items:center;gap:10px;background:var(--felt);border-radius:16px;padding:18px 12px;min-height:150px;box-shadow:inset 0 0 40px rgba(0,0,0,.35),0 4px 20px rgba(0,0,0,.4)}
+.side-indicator{display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0;transition:filter .3s}
+.side-label{font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;color:rgba(255,255,255,.2);transition:color .3s}
+.side-arrow{font-size:.7rem;color:rgba(255,255,255,.1);transition:color .3s,transform .3s}
+.side-indicator.active .side-label{color:#ff7070}
+.side-indicator.active .side-arrow{color:#ff7070;transform:scale(1.3)}
+.side-indicator.active{filter:drop-shadow(0 0 8px rgba(255,80,80,.6))}
+.tischmitte-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:10px}
+.tischmitte{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;min-height:90px;align-items:center}
+.tisch-hint{color:rgba(255,255,255,.22);font-size:.8rem;font-style:italic;text-align:center;line-height:1.5}
+.tisch-hint strong{font-style:normal;color:rgba(255,255,255,.4)}
+.round-display{font-size:.75rem;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;min-height:18px}
+
+/* Karten */
+.card{width:54px;height:80px;background:var(--card-bg);border:1px solid var(--card-bdr);border-radius:7px;display:flex;flex-direction:column;justify-content:space-between;padding:4px 5px;box-shadow:2px 3px 10px rgba(0,0,0,.45);color:var(--bsuit);font-weight:700;user-select:none;cursor:default;animation:deal .28s ease-out both}
+.card:nth-child(1){animation-delay:0s}
+.card:nth-child(2){animation-delay:.07s}
+.card:nth-child(3){animation-delay:.14s}
+@keyframes deal{from{transform:translateY(-24px) rotate(-6deg) scale(.75);opacity:0}to{transform:translateY(0) rotate(0) scale(1);opacity:1}}
+.card.red{color:var(--red)}
+.card-top{font-size:.68rem;line-height:1.15;text-align:left}
+.card-mid{font-size:1.25rem;text-align:center;line-height:1}
+.card-bot{font-size:.68rem;line-height:1.15;text-align:right;transform:rotate(180deg)}
+.card.small{width:30px;height:44px;padding:2px 3px;border-radius:4px;box-shadow:1px 2px 6px rgba(0,0,0,.4);animation:deal .4s ease-out both}
+.card.small .card-top{font-size:.5rem}
+.card.small .card-mid{font-size:.78rem}
+.card.small .card-bot{font-size:.5rem}
+
+/* Ergebnis */
+.result-display{text-align:center;font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;letter-spacing:3px;min-height:40px;line-height:40px;transition:all .3s}
+.result-display.correct{color:var(--ok);text-shadow:0 0 20px rgba(46,204,113,.4)}
+.result-display.wrong{color:var(--err);text-shadow:0 0 20px rgba(231,76,60,.4)}
+.result-display.info{color:var(--gold);font-size:.85rem;letter-spacing:1px}
+
+/* Buttons */
+.buttons{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.btn{padding:14px 22px;font-family:'Lato',sans-serif;font-size:.9rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;border:none;border-radius:8px;cursor:pointer;transition:all .18s;min-width:100px;min-height:50px;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.btn:active{transform:scale(.96)}
+.btn-start{background:var(--gold);color:#1a1100;box-shadow:0 3px 12px rgba(201,162,39,.35)}
+.btn-start:hover{background:var(--gold-l)}
+.btn-weiter{background:rgba(255,255,255,.1);color:var(--text);border:1px solid rgba(255,255,255,.18)}
+.btn-weiter:hover{background:rgba(255,255,255,.18)}
+.btn-loesen{background:rgba(192,57,43,.65);color:#fff;border:1px solid rgba(231,76,60,.7)}
+.btn-loesen:hover{background:rgba(192,57,43,.9)}
+.hidden{display:none!important}
+
+/* Modal */
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.82);display:flex;align-items:center;justify-content:center;z-index:200;padding:20px;animation:fadeIn .2s ease}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.modal.hidden{display:none!important}
+.modal-box{background:var(--felt-dark);border:2px solid var(--gold);border-radius:16px;padding:30px 24px 26px;max-width:340px;width:100%;text-align:center;box-shadow:0 0 60px rgba(201,162,39,.25);animation:popIn .3s cubic-bezier(.34,1.56,.64,1)}
+@keyframes popIn{from{transform:scale(.7);opacity:0}to{transform:scale(1);opacity:1}}
+.modal-icon{font-size:2.8rem;margin-bottom:8px}
+.modal-title{font-family:'Playfair Display',serif;font-size:1.5rem;color:var(--gold);margin-bottom:14px}
+.modal-msg{font-size:.88rem;line-height:1.65;color:var(--text);margin-bottom:24px}
+
+/* Responsive */
+@media(max-width:400px){
+  .score-panel{grid-template-columns:1fr}
+  .skat-divider{flex-direction:row;border-left:none;border-right:none;border-top:1px solid rgba(255,255,255,.07);border-bottom:1px solid rgba(255,255,255,.07);padding:8px 0;justify-content:center;gap:16px}
+  .card{width:48px;height:72px}
+  .title{letter-spacing:2px}
+}
+@media(max-width:320px){
+  .card{width:42px;height:64px}
+  .btn{min-width:86px;padding:12px 14px;font-size:.82rem}
+}
+  </style>
 </head>
 <body>
 
-  <div class="container">
+<div class="container">
 
-    <!-- Header & Stats -->
-    <header class="header">
-      <h1 class="title">♠ SKAT TRAINER ♠</h1>
-      <div class="stats-row">
-        <div class="stat">
-          <div class="stat-label">Rang</div>
-          <div class="stat-value" id="statRang">Anfänger</div>
-        </div>
-        <div class="stat">
-          <div class="stat-label">Siegesserie</div>
-          <div class="stat-value" id="statSiege">0</div>
-        </div>
-        <div class="stat">
-          <div class="stat-label">Spiele</div>
-          <div class="stat-value" id="statSpiele">0</div>
-        </div>
-        <div class="stat">
-          <div class="stat-label">Rekord</div>
-          <div class="stat-value" id="statRekord">0</div>
-        </div>
+  <header class="header">
+    <h1 class="title">♠ SKAT TRAINER ♠</h1>
+    <div class="stats-row">
+      <div class="stat"><div class="stat-label">Rang</div><div class="stat-value" id="statRang">Anfänger</div></div>
+      <div class="stat"><div class="stat-label">Siegesserie</div><div class="stat-value" id="statSiege">0</div></div>
+      <div class="stat"><div class="stat-label">Spiele</div><div class="stat-value" id="statSpiele">0</div></div>
+      <div class="stat"><div class="stat-label">Rekord</div><div class="stat-value" id="statRekord">0</div></div>
+    </div>
+  </header>
+
+  <section class="score-panel">
+    <div class="party-score">
+      <div class="party-name">Meine Partei</div>
+      <div class="score-row">
+        <span class="score-label">Geschätzt</span>
+        <input type="number" id="inputA" class="score-input" placeholder="?" min="0" max="120" inputmode="numeric">
       </div>
-    </header>
-
-    <!-- Score Section: Meine Partei | Skat | Gegenpartei -->
-    <section class="score-panel">
-
-      <div class="party-score" id="partyAPanel">
-        <div class="party-name">Meine Partei</div>
-        <div class="score-row">
-          <span class="score-label">Geschätzt</span>
-          <input type="number" id="inputA" class="score-input"
-                 placeholder="?" min="0" max="120" inputmode="numeric">
-        </div>
-        <div class="score-row">
-          <span class="score-label">Ist</span>
-          <span id="actualA" class="actual-value">—</span>
-        </div>
+      <div class="score-row">
+        <span class="score-label">Ist</span>
+        <span id="actualA" class="actual-value">—</span>
       </div>
-
-      <div class="skat-divider">
-        <div class="skat-title">SKAT</div>
-        <div class="skat-cards" id="skatCards">
-          <div class="card-back"></div>
-          <div class="card-back"></div>
-        </div>
-        <div id="skatPunkte" class="skat-punkte">? Pkt.</div>
-      </div>
-
-      <div class="party-score right" id="partyBPanel">
-        <div class="party-name">Gegenpartei</div>
-        <div class="score-row">
-          <span class="score-label">Geschätzt</span>
-          <input type="number" id="inputB" class="score-input"
-                 placeholder="?" min="0" max="120" inputmode="numeric">
-        </div>
-        <div class="score-row">
-          <span class="score-label">Ist</span>
-          <span id="actualB" class="actual-value">—</span>
-        </div>
-      </div>
-
-    </section>
-
-    <!-- Game Table / Tischmitte -->
-    <section class="game-table">
-      <div class="side-indicator" id="indicatorA">
-        <div class="side-label">A</div>
-        <div class="side-arrow">◀</div>
-      </div>
-
-      <div class="tischmitte-wrap">
-        <div class="tischmitte" id="tischmitte">
-          <p class="tisch-hint">Klicke <strong>Start</strong> um zu beginnen</p>
-        </div>
-        <div id="roundDisplay" class="round-display"></div>
-      </div>
-
-      <div class="side-indicator right" id="indicatorB">
-        <div class="side-arrow">▶</div>
-        <div class="side-label">B</div>
-      </div>
-    </section>
-
-    <!-- Result -->
-    <div id="result" class="result-display"></div>
-
-    <!-- Buttons -->
-    <div class="buttons">
-      <button id="btnStart" class="btn btn-start">Start</button>
-      <button id="btnWeiter" class="btn btn-weiter hidden">Weiter</button>
-      <button id="btnLoesen" class="btn btn-loesen hidden">Lösen</button>
     </div>
 
-  </div>
-
-  <!-- Rank-Up Modal -->
-  <div id="modal" class="modal hidden" role="dialog" aria-modal="true">
-    <div class="modal-box">
-      <div class="modal-icon">🎉</div>
-      <div class="modal-title" id="modalTitle">Aufgestiegen!</div>
-      <div class="modal-msg" id="modalMsg"></div>
-      <button id="modalClose" class="btn btn-start">Weiter geht's!</button>
+    <div class="skat-divider">
+      <div class="skat-title">SKAT</div>
+      <div class="skat-cards" id="skatCards">
+        <div class="card-back"></div>
+        <div class="card-back"></div>
+      </div>
+      <div id="skatPunkte" class="skat-punkte">? Pkt.</div>
     </div>
+
+    <div class="party-score">
+      <div class="party-name">Gegenpartei</div>
+      <div class="score-row">
+        <span class="score-label">Geschätzt</span>
+        <input type="number" id="inputB" class="score-input" placeholder="?" min="0" max="120" inputmode="numeric">
+      </div>
+      <div class="score-row">
+        <span class="score-label">Ist</span>
+        <span id="actualB" class="actual-value">—</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="game-table">
+    <div class="side-indicator" id="indicatorA">
+      <div class="side-label">A</div>
+      <div class="side-arrow">◀</div>
+    </div>
+    <div class="tischmitte-wrap">
+      <div class="tischmitte" id="tischmitte">
+        <p class="tisch-hint">Klicke <strong>Start</strong> um zu beginnen</p>
+      </div>
+      <div id="roundDisplay" class="round-display"></div>
+    </div>
+    <div class="side-indicator" id="indicatorB">
+      <div class="side-arrow">▶</div>
+      <div class="side-label">B</div>
+    </div>
+  </section>
+
+  <div id="result" class="result-display"></div>
+
+  <div class="buttons">
+    <button id="btnStart"  class="btn btn-start">Start</button>
+    <button id="btnWeiter" class="btn btn-weiter hidden">Weiter</button>
+    <button id="btnLoesen" class="btn btn-loesen hidden">Lösen</button>
   </div>
 
-  <script src="app.js"></script>
+</div>
+
+<div id="modal" class="modal hidden">
+  <div class="modal-box">
+    <div class="modal-icon">🎉</div>
+    <div class="modal-title" id="modalTitle"></div>
+    <div class="modal-msg"   id="modalMsg"></div>
+    <button id="modalClose" class="btn btn-start">Weiter geht's!</button>
+  </div>
+</div>
+
+<script>
+// ================================================
+// SKAT TRAINER – Spiellogik
+// Portierung von Rechner4.xlsm (Excel/VBA)
+// ================================================
+
+var SUITS = ['♦','♥','♠','♣'];
+var CARD_VALS = [
+  {label:'7', pts:0 },{label:'8', pts:0 },{label:'9', pts:0 },
+  {label:'10',pts:10},{label:'B', pts:2 },{label:'D', pts:3 },
+  {label:'K', pts:4 },{label:'A', pts:11}
+];
+
+var RANKS = [
+  {name:'Anfänger',         min:0  },
+  {name:'Skat-Bauer',       min:1  },
+  {name:'Kneipen-Dübler',   min:6  },
+  {name:'Kreuz-Bube',       min:12 },
+  {name:'Skat-Meister',     min:36 },
+  {name:'Skat-Großmeister', min:72 },
+  {name:'König Skat der I.',min:180}
+];
+
+var RANK_MSGS = {
+  'Skat-Bauer':       'Herzlichen Glückwunsch, Skat-Bauer! Dein erster Sieg!',
+  'Kneipen-Dübler':   'Wow… 6 hintereinander… Das war wahrscheinlich nur Glück… Und wenn nicht, bist du immerhin kein Anfänger mehr. Bleib dran!',
+  'Kreuz-Bube':       'Immerhin ein Drittel eines Spiels am Stück. Für die Eckkneipe wird es schon reichen. Schaffst du auch ein ganzes Spiel am Stück?',
+  'Skat-Meister':     'Ein ganzes Spiel am Stück! Nicht schlecht… Ich denke, ich muss nicht erwähnen, dass dies einem wahren Meister allerdings noch lange nicht genügt. Dies war erst der Anfang!',
+  'Skat-Großmeister': 'Unglaublich! Du hast den Rang des Skat-Großmeisters erreicht! Die Karten verneigen sich vor dir.',
+  'König Skat der I.':'Die Skatwelt liegt dir zu Füßen!'
+};
+
+// Spielzustand
+var state = {
+  deck: [], scoreA: 0, scoreB: 0,
+  round: 1, currentCards: [], currentParty: null,
+  phase: 'idle'
+};
+
+// --- Deck ---
+function createDeck() {
+  var d = [];
+  for (var s=0;s<SUITS.length;s++)
+    for (var v=0;v<CARD_VALS.length;v++)
+      d.push({suit:SUITS[s], label:CARD_VALS[v].label, pts:CARD_VALS[v].pts});
+  return d;
+}
+function drawRandom(deck) {
+  var i = Math.floor(Math.random()*deck.length);
+  return deck.splice(i,1)[0];
+}
+
+// --- Fortschritt ---
+function loadP() {
+  try { return JSON.parse(localStorage.getItem('skat_p')) || {streak:0,record:0,games:0}; }
+  catch(e) { return {streak:0,record:0,games:0}; }
+}
+function saveP(p) {
+  try { localStorage.setItem('skat_p', JSON.stringify(p)); } catch(e){}
+}
+function getRank(streak) {
+  var r = RANKS[0];
+  for (var i=0;i<RANKS.length;i++) {
+    if (streak >= RANKS[i].min) r = RANKS[i]; else break;
+  }
+  return r;
+}
+
+// --- UI ---
+function G(id) { return document.getElementById(id); }
+function show(id) { G(id).classList.remove('hidden'); }
+function hide(id) { G(id).classList.add('hidden'); }
+
+function mkCard(card, small) {
+  var red = card.suit==='♥'||card.suit==='♦';
+  var d = document.createElement('div');
+  d.className = 'card'+(red?' red':'')+(small?' small':'');
+  d.innerHTML =
+    '<div class="card-top">'+card.label+'<br>'+card.suit+'</div>'+
+    '<div class="card-mid">'+card.suit+'</div>'+
+    '<div class="card-bot">'+card.suit+'<br>'+card.label+'</div>';
+  return d;
+}
+
+function updateStats() {
+  var p = loadP();
+  var r = getRank(p.streak);
+  G('statRang').textContent   = r.name;
+  G('statSiege').textContent  = p.streak;
+  G('statSpiele').textContent = p.games;
+  G('statRekord').textContent = p.record;
+}
+
+function showModal(title, msg) {
+  G('modalTitle').textContent = title;
+  G('modalMsg').textContent   = msg;
+  G('modal').classList.remove('hidden');
+}
+
+function renderTable() {
+  var t = G('tischmitte');
+  t.innerHTML = '';
+  for (var i=0;i<state.currentCards.length;i++)
+    t.appendChild(mkCard(state.currentCards[i], false));
+}
+
+// --- Spiellogik (= VBA-Prozeduren) ---
+
+function startGame() {                          // Start_Click
+  state.deck         = createDeck();
+  state.scoreA       = 0;
+  state.scoreB       = 0;
+  state.round        = 1;
+  state.currentCards = [];
+  state.currentParty = null;
+  state.phase        = 'playing';
+
+  var p = loadP();
+  p.games++;
+  saveP(p);
+
+  G('inputA').value          = '';
+  G('inputB').value          = '';
+  G('inputA').disabled       = false;
+  G('inputB').disabled       = false;
+  G('actualA').textContent   = '—';
+  G('actualB').textContent   = '—';
+  G('actualA').className     = 'actual-value';
+  G('actualB').className     = 'actual-value';
+  G('skatPunkte').textContent= '? Pkt.';
+  G('skatCards').innerHTML   = '<div class="card-back"></div><div class="card-back"></div>';
+  G('result').textContent    = '';
+  G('result').className      = 'result-display';
+  G('indicatorA').className  = 'side-indicator';
+  G('indicatorB').className  = 'side-indicator';
+  G('btnStart').textContent  = 'Neustart';
+
+  show('btnWeiter');
+  hide('btnLoesen');
+  updateStats();
+  nextRound();                                  // sofort erste Runde (wie im VBA)
+}
+
+function nextRound() {                          // Weiter_Click
+  var pts = 0, drawn = [];
+  for (var i=0;i<3;i++) {
+    var c = drawRandom(state.deck);
+    pts += c.pts;
+    drawn.push(c);
+  }
+
+  var party = Math.random()<0.5 ? 'A' : 'B';   // Int(2*Rnd)+1
+  if (party==='A') state.scoreA += pts;
+  else             state.scoreB += pts;
+
+  state.currentCards = drawn;
+  state.currentParty = party;
+
+  renderTable();
+  G('roundDisplay').textContent = 'Runde '+state.round+' / 10';
+  state.round++;
+
+  G('indicatorA').className = 'side-indicator'+(party==='A'?' active':'');
+  G('indicatorB').className = 'side-indicator'+(party==='B'?' active':'');
+
+  if (state.deck.length === 2) {               // Skat übrig → Lösen
+    hide('btnWeiter');
+    show('btnLoesen');
+  }
+}
+
+function solve() {                              // Loesen_Click
+  var ra = G('inputA').value.trim();
+  var rb = G('inputB').value.trim();
+
+  if (ra===''||rb==='') {
+    G('result').textContent = 'Bitte beide Felder ausfüllen!';
+    G('result').className   = 'result-display info';
+    return;
+  }
+
+  var ga = parseInt(ra,10);
+  var gb = parseInt(rb,10);
+
+  if (isNaN(ga)||isNaN(gb)) {
+    G('result').textContent = 'Nur Zahlen eingeben!';
+    G('result').className   = 'result-display info';
+    return;
+  }
+
+  // Skat-Karten (letzte 2)
+  var s1 = state.deck[0], s2 = state.deck[1];
+  G('skatPunkte').textContent = (s1.pts+s2.pts)+' Pkt.';
+  G('skatCards').innerHTML = '';
+  G('skatCards').appendChild(mkCard(s1,true));
+  G('skatCards').appendChild(mkCard(s2,true));
+
+  // Auflösung
+  G('actualA').textContent = state.scoreA;
+  G('actualB').textContent = state.scoreB;
+  G('inputA').disabled = true;
+  G('inputB').disabled = true;
+  hide('btnLoesen');
+  G('btnStart').textContent = 'Nächste Runde';
+
+  var correct = (ga===state.scoreA) && (gb===state.scoreB);
+  G('actualA').classList.add(ga===state.scoreA ? 'correct':'wrong');
+  G('actualB').classList.add(gb===state.scoreB ? 'correct':'wrong');
+
+  var p         = loadP();
+  var prevRank  = getRank(p.streak);
+  var oldRecord = p.record;
+
+  if (correct) {
+    p.streak++;
+    if (p.streak > p.record) p.record = p.streak;
+    G('result').textContent = '✓ Richtig!';
+    G('result').className   = 'result-display correct';
+  } else {
+    p.streak = 0;                               // Streak reset (wie im VBA)
+    G('result').textContent = '✗ Flasch!';
+    G('result').className   = 'result-display wrong';
+  }
+
+  saveP(p);
+  updateStats();
+  state.phase = 'solved';
+
+  if (correct) {
+    var newRank = getRank(p.streak);
+    if (newRank.name !== prevRank.name && RANK_MSGS[newRank.name]) {
+      setTimeout(function(){ showModal('🎉 '+newRank.name+'!', RANK_MSGS[newRank.name]); }, 700);
+    } else if (p.streak > oldRecord && p.streak > 1) {
+      var diff = p.streak - oldRecord;
+      var msg  = diff>1
+        ? p.streak+' hintereinander! Das sind '+diff+' mehr als dein letzter Rekord!'
+        : 'Und nochmal steigt dein Rekord um einen! Weitermachen!';
+      setTimeout(function(){ showModal('⭐ Neuer Rekord!', msg); }, 700);
+    }
+  }
+}
+
+// --- Events ---
+G('btnStart').addEventListener('click',  startGame);
+G('btnWeiter').addEventListener('click', nextRound);
+G('btnLoesen').addEventListener('click', solve);
+G('modalClose').addEventListener('click', function(){ G('modal').classList.add('hidden'); });
+G('inputA').addEventListener('keydown', function(e){ if(e.key==='Enter') G('inputB').focus(); });
+G('inputB').addEventListener('keydown', function(e){ if(e.key==='Enter' && state.phase!=='idle') solve(); });
+
+// --- Init ---
+updateStats();
+</script>
 </body>
 </html>
