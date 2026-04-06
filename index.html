@@ -296,13 +296,14 @@ body {
 }
 
 /* =====================================================================
-   PLAYING CARDS  –  redesigned
+   PLAYING CARDS  –  Dark luxury design
+   Dark backgrounds are left alone by Force Dark; light backgrounds get
+   inverted. By designing dark cards we win on all browsers.
    ===================================================================== */
 .card {
-  background-color: #fefcf5;
-  background-image: linear-gradient(145deg, #fffdf7 0%, #f5f0e2 100%);
-  color: #1a1a2e;
-  border: 1px solid #c8bfa0;
+  background: linear-gradient(155deg, #2d2318 0%, #191410 100%);
+  color: #ede4d0;               /* warm cream for black suits */
+  border: 1px solid rgba(140,105,55,.55);
   border-radius: 8px;
   width: 58px;
   height: 86px;
@@ -313,44 +314,22 @@ body {
   justify-content: space-between;
   padding: 5px 5px 4px;
   box-shadow:
-    3px 4px 14px rgba(0,0,0,.55),
-    0 1px 0   rgba(255,255,255,.6) inset,
-    0 0 0 1px rgba(0,0,0,.08)    inset;
+    3px 4px 14px rgba(0,0,0,.65),
+    0 0 0 1px rgba(201,162,39,.15) inset,
+    0 1px 0   rgba(255,255,255,.06) inset;
   font-weight: 800;
   user-select: none;
   cursor: default;
   animation: deal .3s ease-out both;
-  /* ── Dark-mode protection (triple approach) ───────────────────────
-     1. color-scheme: light  → element renders in light palette
-     2. forced-color-adjust  → blocks Windows High-Contrast overrides
-     3. will-change: transform → own compositor layer; Chrome Force
-        Dark algorithm skips hardware-accelerated layers entirely      */
-  color-scheme: light;
-  forced-color-adjust: none;
-  will-change: transform;
 }
 
-/* Explicit overrides so no dark-mode engine can ever win */
-@media (prefers-color-scheme: dark) {
-  .card {
-    background-color:  #fefcf5 !important;
-    background-image:  linear-gradient(145deg,#fffdf7,#f5f0e2) !important;
-    color:             #1a1a2e !important;
-    border-color:      #c8bfa0 !important;
-  }
-  .card.red          { color: #b52020 !important; }
-  .card .c-label,
-  .card .c-suit,
-  .card .card-suit-center { -webkit-text-fill-color: currentColor; }
-}
-
-/* Inner decorative frame */
+/* Inner decorative gold frame */
 .card::before {
   content: '';
   position: absolute;
   inset: 3px;
   border-radius: 5px;
-  border: 1px solid rgba(0,0,0,.06);
+  border: 1px solid rgba(201,162,39,.12);
   pointer-events: none;
 }
 
@@ -364,14 +343,14 @@ body {
   to   { transform: translateY(0)     rotate(0)    scale(1);   opacity: 1; }
 }
 
-/* Red suits: rich crimson */
-.card.red { color: #b52020; }
+/* Red suits: bright coral-red, visible on dark background */
+.card.red { color: #e85858; }
 
-/* Corner index: label + suit stacked */
+/* Corner index: label + suit stacked – left-aligned */
 .card-corner {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   line-height: 1;
   gap: 1px;
 }
@@ -414,12 +393,8 @@ body {
   height: 50px;
   padding: 3px 3px 2px;
   border-radius: 5px;
-  box-shadow: 2px 2px 8px rgba(0,0,0,.5), 0 0 0 1px rgba(0,0,0,.08) inset;
+  box-shadow: 2px 2px 8px rgba(0,0,0,.5), 0 0 0 1px rgba(201,162,39,.12) inset;
   animation: deal .4s ease-out both;
-  /* Same dark-mode protection as regular cards */
-  color-scheme: light;
-  forced-color-adjust: none;
-  will-change: transform;
 }
 
 .card.small::before { inset: 2px; border-radius: 3px; }
@@ -571,6 +546,10 @@ body {
         <div class="stat-value" id="statSiege">0</div>
       </div>
       <div class="stat">
+        <div class="stat-label">Siege ges.</div>
+        <div class="stat-value" id="statWins">0</div>
+      </div>
+      <div class="stat">
         <div class="stat-label">Spiele</div>
         <div class="stat-value" id="statSpiele">0</div>
       </div>
@@ -653,7 +632,7 @@ body {
 
   <!-- Version – klein und unauffällig -->
   <p style="text-align:center;font-size:.55rem;letter-spacing:2px;color:#2d7a4a;
-             opacity:.65;margin-top:2px;user-select:none;">v1.4</p>
+             opacity:.65;margin-top:2px;user-select:none;">v1.5</p>
 
 </div>
 
@@ -721,8 +700,8 @@ function drawRandom(deck) {
 
 /* ---- Progress ---- */
 function loadP() {
-  try { return JSON.parse(localStorage.getItem('skat_p')) || {streak:0,record:0,games:0}; }
-  catch(e) { return {streak:0,record:0,games:0}; }
+  try { return JSON.parse(localStorage.getItem('skat_p')) || {streak:0,record:0,games:0,wins:0}; }
+  catch(e) { return {streak:0,record:0,games:0,wins:0}; }
 }
 function saveP(p) {
   try { localStorage.setItem('skat_p', JSON.stringify(p)); } catch(e){}
@@ -744,7 +723,8 @@ function hide(id){ G(id).classList.add('hidden'); }
  */
 function mkCard(card, small) {
   var red   = card.suit==='♥' || card.suit==='♦';
-  var color = red ? '#b52020' : '#1a1a2e';
+  /* Dark cards: coral-red for red suits, warm cream for black suits */
+  var color = red ? '#e85858' : '#ede4d0';
 
   var d = document.createElement('div');
   d.className = 'card' + (red ? ' red' : '') + (small ? ' small' : '');
@@ -779,6 +759,7 @@ function updateStats() {
   var p = loadP(), r = getRank(p.streak);
   G('statRang').textContent   = r.name;
   G('statSiege').textContent  = p.streak;
+  G('statWins').textContent   = p.wins || 0;
   G('statSpiele').textContent = p.games;
   G('statRekord').textContent = p.record;
 }
@@ -900,6 +881,7 @@ function solve() {                                /* Loesen_Click */
 
   if(correct){
     p.streak++;
+    p.wins = (p.wins || 0) + 1;       /* total wins – never resets */
     if(p.streak>p.record) p.record=p.streak;
     G('result').textContent='✓ Richtig!';
     G('result').className='result-display correct';
