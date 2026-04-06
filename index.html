@@ -299,8 +299,8 @@ body {
    PLAYING CARDS  –  redesigned
    ===================================================================== */
 .card {
-  /* Hard-coded colors so Force Dark / dark-mode can NEVER invert them */
-  background: linear-gradient(145deg, #fffdf7 0%, #f5f0e2 100%);
+  background-color: #fefcf5;
+  background-image: linear-gradient(145deg, #fffdf7 0%, #f5f0e2 100%);
   color: #1a1a2e;
   border: 1px solid #c8bfa0;
   border-radius: 8px;
@@ -312,7 +312,6 @@ body {
   flex-direction: column;
   justify-content: space-between;
   padding: 5px 5px 4px;
-  /* Double-shadow: outer depth + inner highlight */
   box-shadow:
     3px 4px 14px rgba(0,0,0,.55),
     0 1px 0   rgba(255,255,255,.6) inset,
@@ -321,9 +320,28 @@ body {
   user-select: none;
   cursor: default;
   animation: deal .3s ease-out both;
-  /* Critical: never let the browser invert this card's colors */
+  /* ── Dark-mode protection (triple approach) ───────────────────────
+     1. color-scheme: light  → element renders in light palette
+     2. forced-color-adjust  → blocks Windows High-Contrast overrides
+     3. will-change: transform → own compositor layer; Chrome Force
+        Dark algorithm skips hardware-accelerated layers entirely      */
   color-scheme: light;
   forced-color-adjust: none;
+  will-change: transform;
+}
+
+/* Explicit overrides so no dark-mode engine can ever win */
+@media (prefers-color-scheme: dark) {
+  .card {
+    background-color:  #fefcf5 !important;
+    background-image:  linear-gradient(145deg,#fffdf7,#f5f0e2) !important;
+    color:             #1a1a2e !important;
+    border-color:      #c8bfa0 !important;
+  }
+  .card.red          { color: #b52020 !important; }
+  .card .c-label,
+  .card .c-suit,
+  .card .card-suit-center { -webkit-text-fill-color: currentColor; }
 }
 
 /* Inner decorative frame */
@@ -398,6 +416,10 @@ body {
   border-radius: 5px;
   box-shadow: 2px 2px 8px rgba(0,0,0,.5), 0 0 0 1px rgba(0,0,0,.08) inset;
   animation: deal .4s ease-out both;
+  /* Same dark-mode protection as regular cards */
+  color-scheme: light;
+  forced-color-adjust: none;
+  will-change: transform;
 }
 
 .card.small::before { inset: 2px; border-radius: 3px; }
@@ -628,6 +650,10 @@ body {
     <button id="btnWeiter" class="btn btn-weiter hidden">Weiter</button>
     <button id="btnLoesen" class="btn btn-loesen hidden">Lösen</button>
   </div>
+
+  <!-- Version – klein und unauffällig -->
+  <p style="text-align:center;font-size:.55rem;letter-spacing:2px;color:#2d7a4a;
+             opacity:.65;margin-top:2px;user-select:none;">v1.4</p>
 
 </div>
 
