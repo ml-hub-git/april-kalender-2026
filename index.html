@@ -3,27 +3,25 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <!-- Tells Chrome/Android: this page already has its own dark design, do NOT auto-invert anything -->
   <meta name="color-scheme" content="dark">
   <title>Skat Trainer</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
   <style>
-/* =====================================================================
-   DESIGN TOKENS
-   ===================================================================== */
+/* ── Tokens ─────────────────────────────────────────────── */
 :root {
-  color-scheme: dark;                 /* ← prevents Force Dark on Android */
+  color-scheme: dark;
   --felt:      #0f4a29;
   --felt-dark: #0a2e18;
   --gold:      #c9a227;
   --gold-l:    #e0ba50;
-  --gold-dim:  rgba(201,162,39,0.22);
-  --red:       #c0392b;
+  --gold-dim:  rgba(201,162,39,.22);
+  --red:       #e85858;
   --text:      #f0ead6;
   --muted:     #98906e;
   --ok:        #2ecc71;
   --err:       #e74c3c;
+  --near:      #c9a227;
 }
 
 *,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -42,53 +40,86 @@ body {
 .container {
   max-width: 560px;
   margin: 0 auto;
-  padding: 16px 14px;
+  padding: 14px 14px;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
 }
 
-/* =====================================================================
-   HEADER & STATS
-   ===================================================================== */
+/* ── Header ─────────────────────────────────────────────── */
 .header { text-align: center; }
+
+.title-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
 
 .title {
   font-family: 'Playfair Display', serif;
-  font-size: clamp(1.3rem, 5.5vw, 1.9rem);
+  font-size: clamp(1.2rem, 5vw, 1.8rem);
   font-weight: 900;
   color: var(--gold);
-  letter-spacing: 5px;
+  letter-spacing: 4px;
   text-shadow: 0 0 20px rgba(201,162,39,.35), 0 2px 6px rgba(0,0,0,.5);
-  margin-bottom: 12px;
 }
 
+.icon-btn {
+  background: rgba(255,255,255,.07);
+  border: 1px solid rgba(255,255,255,.15);
+  border-radius: 50%;
+  color: var(--muted);
+  font-size: .8rem;
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all .2s;
+  touch-action: manipulation;
+}
+.icon-btn:hover { background: rgba(255,255,255,.13); color: var(--text); }
+
+/* ── Stats row ──────────────────────────────────────────── */
 .stats-row {
   display: flex;
-  justify-content: center;
-  gap: 6px;
   flex-wrap: wrap;
+  justify-content: center;
+  gap: 5px;
 }
 
 .stat {
   background: rgba(255,255,255,.05);
   border: 1px solid var(--gold-dim);
   border-radius: 8px;
-  padding: 5px 10px;
-  min-width: 64px;
+  padding: 5px 8px;
+  min-width: 58px;
   text-align: center;
+  flex: 1 1 58px;
+  max-width: 90px;
 }
 
+.stat-clickable {
+  cursor: pointer;
+  transition: border-color .2s;
+}
+.stat-clickable:hover { border-color: rgba(201,162,39,.55); }
+.stat-clickable .stat-label::after { content: ' ▸'; font-size: .45rem; opacity: .6; }
+
 .stat-label {
-  font-size: .58rem;
+  font-size: .55rem;
   text-transform: uppercase;
-  letter-spacing: 1.5px;
+  letter-spacing: 1.2px;
   color: var(--muted);
   margin-bottom: 2px;
 }
 
 .stat-value {
-  font-size: .88rem;
+  font-size: .85rem;
   font-weight: 700;
   color: var(--gold);
   white-space: nowrap;
@@ -96,9 +127,50 @@ body {
   text-overflow: ellipsis;
 }
 
-/* =====================================================================
-   SCORE PANEL  –  Desktop: 3-Spalten   Mobile: 2+1
-   ===================================================================== */
+.stat-value.fire { color: #ff8c42; }
+
+/* ── Verlauf (chart section) ────────────────────────────── */
+.verlauf-section {
+  background: rgba(0,0,0,.2);
+  border: 1px solid rgba(255,255,255,.06);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.toggle-btn {
+  width: 100%;
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-family: 'Lato', sans-serif;
+  font-size: .75rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 9px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: color .2s;
+}
+.toggle-btn:hover { color: var(--text); }
+.toggle-arrow { transition: transform .25s; font-size: .6rem; }
+.toggle-arrow.open { transform: rotate(180deg); }
+
+.verlauf-body {
+  padding: 0 12px 12px;
+  display: none;
+}
+.verlauf-body.open { display: block; }
+
+#chartWrap {
+  width: 100%;
+  overflow: hidden;
+}
+
+/* ── Score Panel ────────────────────────────────────────── */
 .score-panel {
   display: grid;
   grid-template-columns: 1fr auto 1fr;
@@ -107,51 +179,43 @@ body {
   background: rgba(0,0,0,.3);
   border: 1px solid rgba(255,255,255,.07);
   border-radius: 10px;
-  padding: 14px 12px;
+  padding: 12px;
 }
 
 .party-a { grid-area: partya; }
 .party-b { grid-area: partyb; }
-.skat-divider { grid-area: skat; }
+.skat-div { grid-area: skat; }
 
-.party-score {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
+.party-score { display: flex; flex-direction: column; gap: 7px; }
 
 .party-name {
   font-family: 'Playfair Display', serif;
-  font-size: .72rem;
+  font-size: .7rem;
   text-transform: uppercase;
   letter-spacing: 1.5px;
   color: var(--muted);
   margin-bottom: 2px;
 }
 
-.score-row {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
+.score-row { display: flex; align-items: center; gap: 6px; }
 
 .score-label {
-  font-size: .62rem;
+  font-size: .6rem;
   color: var(--muted);
   text-transform: uppercase;
   flex-shrink: 0;
-  width: 58px;
+  width: 55px;
 }
 
 .score-input {
-  width: 62px;
-  padding: 8px 6px;
+  width: 60px;
+  padding: 7px 5px;
   background: rgba(255,255,255,.09);
   border: 1px solid rgba(201,162,39,.3);
   border-radius: 6px;
-  color: #f0ead6;
+  color: var(--text);
   font-family: 'Lato', sans-serif;
-  font-size: 1.1rem;
+  font-size: 1.05rem;
   font-weight: 700;
   text-align: center;
   -moz-appearance: textfield;
@@ -159,253 +223,175 @@ body {
 }
 .score-input::-webkit-inner-spin-button,
 .score-input::-webkit-outer-spin-button { -webkit-appearance: none; }
-.score-input:focus {
-  outline: none;
-  border-color: var(--gold);
-  background: rgba(255,255,255,.14);
-}
+.score-input:focus { outline: none; border-color: var(--gold); background: rgba(255,255,255,.14); }
 .score-input:disabled { opacity: .5; cursor: not-allowed; }
 
 .actual-value {
   font-family: 'Playfair Display', serif;
-  font-size: 1.1rem;
+  font-size: 1.05rem;
   font-weight: 700;
   color: var(--gold);
-  min-width: 30px;
+  min-width: 26px;
   text-align: center;
   transition: color .3s;
 }
 .actual-value.correct { color: var(--ok); }
 .actual-value.wrong   { color: var(--err); }
 
-/* Skat middle column */
-.skat-divider {
+/* Skat center column */
+.skat-div {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  padding: 0 10px;
+  gap: 5px;
+  padding: 0 8px;
   border-left:  1px solid rgba(255,255,255,.07);
   border-right: 1px solid rgba(255,255,255,.07);
 }
+.skat-title { font-size: .58rem; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); }
+.skat-cards { display: flex; gap: 4px; }
+.skat-punkte { font-size: .65rem; color: var(--muted); white-space: nowrap; }
 
-.skat-title {
-  font-size: .6rem;
-  letter-spacing: 2.5px;
-  text-transform: uppercase;
-  color: var(--muted);
-}
-
-.skat-cards { display: flex; gap: 5px; }
-
-.skat-punkte {
-  font-size: .7rem;
-  color: var(--muted);
-  white-space: nowrap;
-}
-
-/* Card-back placeholder */
 .card-back {
-  width: 34px;
-  height: 50px;
-  background: repeating-linear-gradient(
-    45deg, #1a5c35, #1a5c35 3px, #1d6b3e 3px, #1d6b3e 6px);
-  border: 1px solid rgba(255,255,255,.15);
-  border-radius: 5px;
-  opacity: .6;
+  width: 32px; height: 46px;
+  background: repeating-linear-gradient(45deg,#1a5c35,#1a5c35 3px,#1d6b3e 3px,#1d6b3e 6px);
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 4px; opacity: .55;
 }
 
-/* =====================================================================
-   GAME TABLE
-   ===================================================================== */
+/* ── Card legend ────────────────────────────────────────── */
+.legend-section {
+  background: rgba(0,0,0,.15);
+  border: 1px solid rgba(255,255,255,.06);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.legend-body {
+  display: none;
+  padding: 2px 14px 12px;
+}
+.legend-body.open { display: block; }
+
+.legend-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 5px;
+  margin-top: 6px;
+}
+
+.legend-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(255,255,255,.04);
+  border-radius: 6px;
+  padding: 5px 8px;
+  font-size: .78rem;
+}
+
+.l-card { font-weight: 700; color: var(--gold); }
+.l-pts  { color: var(--muted); }
+.legend-total {
+  margin-top: 6px;
+  text-align: center;
+  font-size: .68rem;
+  color: var(--muted);
+  border-top: 1px solid rgba(255,255,255,.06);
+  padding-top: 6px;
+}
+
+/* ── Game Table ─────────────────────────────────────────── */
 .game-table {
   display: flex;
   align-items: center;
   gap: 8px;
   background: var(--felt);
   border-radius: 16px;
-  padding: 18px 10px;
-  min-height: 155px;
+  padding: 16px 10px;
+  min-height: 148px;
   box-shadow: inset 0 0 40px rgba(0,0,0,.35), 0 4px 20px rgba(0,0,0,.4);
 }
 
 .side-indicator {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  flex-shrink: 0;
-  transition: filter .3s;
-  width: 28px;
+  display: flex; flex-direction: column; align-items: center;
+  gap: 4px; flex-shrink: 0; transition: filter .3s; width: 26px;
 }
-
-.side-label {
-  font-family: 'Playfair Display', serif;
-  font-size: 1rem;
-  font-weight: 700;
-  color: rgba(255,255,255,.2);
-  transition: color .3s;
-}
-
-.side-arrow {
-  font-size: .65rem;
-  color: rgba(255,255,255,.1);
-  transition: color .3s, transform .3s;
-}
-
+.side-label { font-family:'Playfair Display',serif; font-size:1rem; font-weight:700; color:rgba(255,255,255,.2); transition:color .3s; }
+.side-arrow { font-size:.6rem; color:rgba(255,255,255,.1); transition:color .3s,transform .3s; }
 .side-indicator.active .side-label { color: #ff7070; }
 .side-indicator.active .side-arrow { color: #ff7070; transform: scale(1.4); }
 .side-indicator.active { filter: drop-shadow(0 0 8px rgba(255,80,80,.6)); }
 
-.tischmitte-wrap {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-}
+.tischmitte-wrap { flex:1; display:flex; flex-direction:column; align-items:center; gap:8px; }
+.tischmitte { display:flex; justify-content:center; gap:10px; flex-wrap:wrap; min-height:88px; align-items:center; }
+.tisch-hint { color:rgba(255,255,255,.22); font-size:.78rem; font-style:italic; text-align:center; line-height:1.5; }
+.tisch-hint strong { font-style:normal; color:rgba(255,255,255,.38); }
+.round-display { font-size:.7rem; color:var(--muted); letter-spacing:1.5px; text-transform:uppercase; min-height:16px; }
 
-.tischmitte {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  flex-wrap: wrap;
-  min-height: 96px;
-  align-items: center;
-}
-
-.tisch-hint {
-  color: rgba(255,255,255,.22);
-  font-size: .8rem;
-  font-style: italic;
-  text-align: center;
-  line-height: 1.5;
-}
-.tisch-hint strong {
-  font-style: normal;
-  color: rgba(255,255,255,.4);
-}
-
-.round-display {
-  font-size: .72rem;
-  color: var(--muted);
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  min-height: 18px;
-}
-
-/* =====================================================================
-   PLAYING CARDS  –  Dark luxury design
-   Dark backgrounds are left alone by Force Dark; light backgrounds get
-   inverted. By designing dark cards we win on all browsers.
-   ===================================================================== */
+/* ── Playing cards ───────────────────────────────────────── */
 .card {
-  background: linear-gradient(155deg, #2d2318 0%, #191410 100%);
-  color: #ede4d0;               /* warm cream for black suits */
-  border: 1px solid rgba(140,105,55,.55);
+  background: linear-gradient(145deg, #fffdf7 0%, #f5f0e2 100%);
+  color: #1a1a2e;
+  border: 1px solid #c8bfa0;
   border-radius: 8px;
-  width: 58px;
-  height: 86px;
+  width: 56px; height: 84px;
   flex-shrink: 0;
   position: relative;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   padding: 5px 5px 4px;
-  box-shadow:
-    3px 4px 14px rgba(0,0,0,.65),
-    0 0 0 1px rgba(201,162,39,.15) inset,
-    0 1px 0   rgba(255,255,255,.06) inset;
+  box-shadow: 3px 4px 14px rgba(0,0,0,.45),
+              0 1px 0 rgba(255,255,255,.7) inset,
+              0 0 0 1px rgba(0,0,0,.06) inset;
   font-weight: 800;
   user-select: none;
   cursor: default;
   animation: deal .3s ease-out both;
 }
-
-/* Inner decorative gold frame */
 .card::before {
-  content: '';
-  position: absolute;
-  inset: 3px;
-  border-radius: 5px;
-  border: 1px solid rgba(201,162,39,.12);
-  pointer-events: none;
+  content:''; position:absolute; inset:3px;
+  border-radius:5px; border:1px solid rgba(201,162,39,.12);
+  pointer-events:none;
 }
-
-/* Staggered deal animation */
-.card:nth-child(1) { animation-delay: 0s; }
-.card:nth-child(2) { animation-delay: .08s; }
-.card:nth-child(3) { animation-delay: .16s; }
+.card:nth-child(1){animation-delay:0s}
+.card:nth-child(2){animation-delay:.08s}
+.card:nth-child(3){animation-delay:.16s}
 
 @keyframes deal {
-  from { transform: translateY(-28px) rotate(-8deg) scale(.7); opacity: 0; }
-  to   { transform: translateY(0)     rotate(0)    scale(1);   opacity: 1; }
+  from { transform:translateY(-26px) rotate(-7deg) scale(.72); opacity:0; }
+  to   { transform:translateY(0) rotate(0) scale(1); opacity:1; }
 }
 
-/* Red suits: bright coral-red, visible on dark background */
-.card.red { color: #e85858; }
+.card.red { color: #c0392b; }
 
-/* Corner index: label + suit stacked – left-aligned */
 .card-corner {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  line-height: 1;
-  gap: 1px;
+  display: flex; flex-direction: column;
+  align-items: flex-start; line-height: 1; gap: 1px;
 }
+.c-label { font-size:.7rem; font-weight:900; letter-spacing:-.5px; line-height:1; }
+.c-suit  { font-size:.52rem; line-height:1; }
+.card-corner.bot { transform:rotate(180deg); align-self:flex-end; }
 
-.card-corner .c-label {
-  font-size: .72rem;
-  font-weight: 900;
-  letter-spacing: -.5px;
-  line-height: 1;
-}
-
-.card-corner .c-suit {
-  font-size: .55rem;
-  line-height: 1;
-}
-
-/* Bottom corner: rotated 180° */
-.card-corner.bot {
-  transform: rotate(180deg);
-  align-self: flex-end;
-}
-
-/* Large center suit */
 .card-suit-center {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.7rem;
-  line-height: 1;
-  /* Slightly desaturate center for elegance */
-  opacity: .88;
-  pointer-events: none;
+  position:absolute; inset:0;
+  display:flex; align-items:center; justify-content:center;
+  font-size:1.6rem; line-height:1; opacity:.9; pointer-events:none;
 }
 
-/* Small Skat cards */
 .card.small {
-  width: 34px;
-  height: 50px;
-  padding: 3px 3px 2px;
-  border-radius: 5px;
-  box-shadow: 2px 2px 8px rgba(0,0,0,.5), 0 0 0 1px rgba(201,162,39,.12) inset;
-  animation: deal .4s ease-out both;
+  width:32px; height:46px; padding:3px 3px 2px; border-radius:5px;
+  box-shadow:2px 2px 8px rgba(0,0,0,.4), 0 1px 0 rgba(255,255,255,.6) inset;
+  animation:deal .4s ease-out both;
 }
+.card.small::before { inset:2px; border-radius:3px; }
+.card.small .c-label { font-size:.46rem; }
+.card.small .c-suit  { font-size:.36rem; }
+.card.small .card-suit-center { font-size:.95rem; }
 
-.card.small::before { inset: 2px; border-radius: 3px; }
-
-.card.small .c-label   { font-size: .5rem; }
-.card.small .c-suit    { font-size: .4rem; }
-.card.small .card-suit-center { font-size: 1rem; }
-
-/* =====================================================================
-   RESULT & BUTTONS
-   ===================================================================== */
+/* ── Result display ─────────────────────────────────────── */
 .result-display {
   text-align: center;
   font-family: 'Playfair Display', serif;
@@ -416,159 +402,251 @@ body {
   line-height: 40px;
   transition: all .3s;
 }
-.result-display.correct { color: var(--ok);  text-shadow: 0 0 20px rgba(46,204,113,.4); }
-.result-display.wrong   { color: var(--err); text-shadow: 0 0 20px rgba(231,76,60,.4);  }
-.result-display.info    { color: var(--gold); font-size: .85rem; letter-spacing: 1px; }
+.result-display.correct { color:var(--ok);   text-shadow:0 0 20px rgba(46,204,113,.4); }
+.result-display.near    { color:var(--near);  text-shadow:0 0 20px rgba(201,162,39,.35); }
+.result-display.wrong   { color:var(--err);   text-shadow:0 0 20px rgba(231,76,60,.4); }
+.result-display.info    { color:var(--gold);  font-size:.85rem; letter-spacing:1px; }
 
-.buttons {
-  display: flex;
-  gap: 10px;
-  justify-content: center;
-  flex-wrap: wrap;
-}
+/* ── Buttons ────────────────────────────────────────────── */
+.buttons { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
 
 .btn {
-  padding: 14px 22px;
-  font-family: 'Lato', sans-serif;
-  font-size: .9rem;
-  font-weight: 700;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all .18s;
-  min-width: 110px;
-  min-height: 50px;
-  touch-action: manipulation;
-  -webkit-tap-highlight-color: transparent;
+  padding:13px 20px;
+  font-family:'Lato',sans-serif; font-size:.88rem; font-weight:700;
+  letter-spacing:1.5px; text-transform:uppercase;
+  border:none; border-radius:8px; cursor:pointer;
+  transition:all .18s; min-width:100px; min-height:48px;
+  touch-action:manipulation; -webkit-tap-highlight-color:transparent;
 }
-.btn:active { transform: scale(.96); }
+.btn:active { transform:scale(.96); }
+.btn-start  { background:var(--gold); color:#1a1100; box-shadow:0 3px 12px rgba(201,162,39,.35); }
+.btn-start:hover  { background:var(--gold-l); }
+.btn-weiter { background:rgba(255,255,255,.1); color:var(--text); border:1px solid rgba(255,255,255,.18); }
+.btn-weiter:hover { background:rgba(255,255,255,.18); }
+.btn-loesen { background:rgba(192,57,43,.65); color:#fff; border:1px solid rgba(231,76,60,.7); }
+.btn-loesen:hover { background:rgba(192,57,43,.9); }
+.hidden { display:none!important; }
 
-.btn-start  { background: var(--gold); color: #1a1100; box-shadow: 0 3px 12px rgba(201,162,39,.35); }
-.btn-start:hover  { background: var(--gold-l); }
-
-.btn-weiter { background: rgba(255,255,255,.1); color: var(--text); border: 1px solid rgba(255,255,255,.18); }
-.btn-weiter:hover { background: rgba(255,255,255,.18); }
-
-.btn-loesen { background: rgba(192,57,43,.65); color: #fff; border: 1px solid rgba(231,76,60,.7); }
-.btn-loesen:hover { background: rgba(192,57,43,.9); }
-
-.hidden { display: none !important; }
-
-/* =====================================================================
-   MODAL
-   ===================================================================== */
+/* ── Rank-up modal ──────────────────────────────────────── */
 .modal {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,.82);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 200;
-  padding: 20px;
-  animation: fadeIn .2s ease;
+  position:fixed; inset:0; background:rgba(0,0,0,.82);
+  display:flex; align-items:center; justify-content:center;
+  z-index:300; padding:20px; animation:fadeIn .2s ease;
 }
-@keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
-.modal.hidden { display: none !important; }
-
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.modal.hidden{display:none!important}
 .modal-box {
-  background: var(--felt-dark);
-  border: 2px solid var(--gold);
-  border-radius: 16px;
-  padding: 30px 24px 26px;
-  max-width: 340px;
-  width: 100%;
-  text-align: center;
-  box-shadow: 0 0 60px rgba(201,162,39,.25);
+  background:var(--felt-dark); border:2px solid var(--gold); border-radius:16px;
+  padding:28px 22px 24px; max-width:340px; width:100%; text-align:center;
+  box-shadow:0 0 60px rgba(201,162,39,.25);
+  animation:popIn .3s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes popIn{from{transform:scale(.7);opacity:0}to{transform:scale(1);opacity:1}}
+.modal-icon  { font-size:2.6rem; margin-bottom:8px; }
+.modal-title { font-family:'Playfair Display',serif; font-size:1.4rem; color:var(--gold); margin-bottom:12px; }
+.modal-msg   { font-size:.86rem; line-height:1.65; color:var(--text); margin-bottom:22px; }
+
+/* ── Onboarding ─────────────────────────────────────────── */
+.onboarding {
+  position:fixed; inset:0; background:rgba(0,0,0,.88);
+  display:flex; align-items:center; justify-content:center;
+  z-index:400; padding:20px; animation:fadeIn .25s ease;
+}
+.onboarding.hidden { display:none!important; }
+
+.onboard-box {
+  background:linear-gradient(160deg, #0f3d20 0%, #0a2e18 100%);
+  border:1px solid rgba(201,162,39,.3);
+  border-radius:18px; padding:28px 22px 22px;
+  max-width:340px; width:100%; text-align:center;
+  box-shadow:0 0 60px rgba(0,0,0,.6);
+  animation:popIn .3s cubic-bezier(.34,1.56,.64,1);
+}
+
+.onboard-icon  { font-size:2.8rem; margin-bottom:10px; }
+.onboard-title {
+  font-family:'Playfair Display',serif; font-size:1.2rem;
+  color:var(--gold); margin-bottom:14px;
+}
+.onboard-list  {
+  list-style:none; text-align:left;
+  display:flex; flex-direction:column; gap:8px; margin-bottom:20px;
+}
+.onboard-list li {
+  font-size:.85rem; line-height:1.45; color:var(--text);
+  display:flex; gap:8px; align-items:flex-start;
+}
+.onboard-list li::before {
+  content:'▸'; color:var(--gold); flex-shrink:0; margin-top:.1rem;
+}
+
+.onboard-dots {
+  display:flex; justify-content:center; gap:8px; margin-bottom:18px;
+}
+.onboard-dot {
+  width:7px; height:7px; border-radius:50%;
+  background:rgba(255,255,255,.2); transition:background .2s;
+}
+.onboard-dot.active { background:var(--gold); }
+
+.onboard-footer {
+  display:flex; align-items:center; justify-content:space-between; gap:10px;
+}
+.onboard-skip {
+  background:none; border:none; color:var(--muted); cursor:pointer;
+  font-family:'Lato',sans-serif; font-size:.75rem;
+  touch-action:manipulation; text-decoration:underline;
+}
+.onboard-skip:hover { color:var(--text); }
+
+/* ── Responsive ─────────────────────────────────────────── */
+@media (max-width:480px) {
+  .score-panel {
+    grid-template-columns:1fr 1fr;
+    grid-template-areas:"partya partyb" "skat skat";
+  }
+  .skat-div {
+    flex-direction:row; flex-wrap:wrap; justify-content:center; gap:10px;
+    padding:8px 0 2px; border-left:none; border-right:none;
+    border-top:1px solid rgba(255,255,255,.07);
+  }
+  .score-label { width:48px; font-size:.56rem; }
+  .card { width:52px; height:78px; }
+  .card .card-suit-center { font-size:1.45rem; }
+}
+@media (max-width:360px) {
+  .card { width:46px; height:70px; }
+  .btn  { min-width:88px; padding:11px 12px; font-size:.82rem; }
+  .title { letter-spacing:2px; }
+}
+
+/* ── Timer (Schwer mode) ───────────────────────────────── */
+.timer-wrap {
+  display: flex; align-items: center; justify-content: center;
+  min-height: 22px;
+}
+.timer-display {
+  font-size: 1.05rem; font-weight: 700; font-variant-numeric: tabular-nums;
+  color: var(--gold); letter-spacing: 1px;
+}
+.timer-display.urgent { color: var(--err); animation: tpulse .5s ease-in-out infinite; }
+@keyframes tpulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+/* ── Settings overlay ──────────────────────────────────── */
+.settings-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,.85);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 400; padding: 20px; animation: fadeIn .2s ease;
+}
+.settings-overlay.hidden { display: none !important; }
+
+.settings-box {
+  background: linear-gradient(160deg, #0f3d20 0%, #0a2e18 100%);
+  border: 1px solid rgba(201,162,39,.3);
+  border-radius: 18px; padding: 24px 20px 20px;
+  max-width: 320px; width: 100%;
+  box-shadow: 0 0 60px rgba(0,0,0,.6);
+  display: flex; flex-direction: column; gap: 18px;
   animation: popIn .3s cubic-bezier(.34,1.56,.64,1);
 }
-@keyframes popIn { from { transform:scale(.7); opacity:0; } to { transform:scale(1); opacity:1; } }
 
-.modal-icon  { font-size: 2.8rem; margin-bottom: 8px; }
-.modal-title { font-family:'Playfair Display',serif; font-size:1.5rem; color:var(--gold); margin-bottom:14px; }
-.modal-msg   { font-size:.88rem; line-height:1.65; color:var(--text); margin-bottom:24px; }
-
-/* =====================================================================
-   RESPONSIVE  –  Mobile: parties side by side, skat below
-   ===================================================================== */
-@media (max-width: 480px) {
-  .score-panel {
-    grid-template-columns: 1fr 1fr;
-    grid-template-areas:
-      "partya partyb"
-      "skat   skat  ";
-    gap: 8px;
-  }
-
-  .skat-divider {
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 12px;
-    padding: 8px 0 2px;
-    border-left: none;
-    border-right: none;
-    border-top: 1px solid rgba(255,255,255,.07);
-  }
-
-  .score-label { width: 52px; font-size: .58rem; }
-
-  .card { width: 54px; height: 80px; }
-  .card .card-suit-center { font-size: 1.5rem; }
-  .card .c-label { font-size: .68rem; }
+.settings-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.2rem; color: var(--gold); text-align: center;
 }
 
-@media (max-width: 360px) {
-  .card { width: 48px; height: 72px; }
-  .card .card-suit-center { font-size: 1.3rem; }
-  .score-input { width: 54px; font-size: 1rem; }
-  .btn { min-width: 90px; padding: 12px 14px; font-size: .82rem; }
-  .title { letter-spacing: 2px; }
+.settings-section-label {
+  font-size: .6rem; text-transform: uppercase; letter-spacing: 1.5px;
+  color: var(--muted); margin-bottom: 8px;
 }
+
+.diff-buttons { display: flex; gap: 6px; margin-bottom: 8px; }
+
+.diff-btn {
+  flex: 1; padding: 10px 4px;
+  background: rgba(255,255,255,.07);
+  border: 1px solid rgba(255,255,255,.15);
+  border-radius: 7px; color: var(--text);
+  font-family: 'Lato', sans-serif; font-size: .82rem; font-weight: 700;
+  cursor: pointer; transition: all .18s; touch-action: manipulation;
+}
+.diff-btn:hover { background: rgba(255,255,255,.14); }
+.diff-btn.active { background: var(--gold); color: #1a1100; border-color: var(--gold); }
+
+.diff-desc {
+  font-size: .74rem; color: var(--muted);
+  text-align: center; line-height: 1.45; min-height: 2.5em;
+}
+
+.btn-reset-wrap { display: flex; flex-direction: column; gap: 8px; }
+
+.btn-reset {
+  width: 100%; padding: 10px;
+  background: rgba(192,57,43,.2); color: #e88;
+  border: 1px solid rgba(231,76,60,.35);
+  font-size: .82rem;
+}
+.btn-reset:hover { background: rgba(192,57,43,.45); }
+
+.reset-confirm {
+  display: flex; flex-direction: column; gap: 7px;
+  align-items: center; padding: 10px;
+  background: rgba(192,57,43,.12); border-radius: 8px;
+  border: 1px solid rgba(231,76,60,.25);
+}
+.reset-confirm span { font-size: .8rem; color: var(--text); }
+.btn-danger {
+  background: var(--err); color: #fff; border: none;
+  padding: 9px 22px; border-radius: 7px; font-size: .82rem;
+}
+.btn-danger:hover { background: #c0392b; }
+.rc-row { display: flex; gap: 8px; }
   </style>
 </head>
 <body>
 
 <div class="container">
 
-  <!-- Header & Stats -->
+  <!-- ── Header ─────────────────────────────────────── -->
   <header class="header">
-    <h1 class="title">♠ SKAT TRAINER ♠</h1>
+    <div class="title-row">
+      <button id="btnInfo" class="icon-btn" title="Spielregeln">ℹ</button>
+      <h1 class="title">♠ SKAT TRAINER ♠</h1>
+      <button id="btnLegendIcon" class="icon-btn" title="Kartenpunkte">?</button>
+      <button id="btnSettings" class="icon-btn" title="Einstellungen">⚙</button>
+    </div>
     <div class="stats-row">
-      <div class="stat">
-        <div class="stat-label">Rang</div>
-        <div class="stat-value" id="statRang">Anfänger</div>
+      <div class="stat"><div class="stat-label">Rang</div><div class="stat-value" id="statRang">Anfänger</div></div>
+      <div class="stat"><div class="stat-label">Siegesserie</div><div class="stat-value" id="statSiege">0</div></div>
+      <div class="stat"><div class="stat-label">Siege ges.</div><div class="stat-value" id="statWins">0</div></div>
+      <div class="stat"><div class="stat-label">Heute</div><div class="stat-value" id="statHeute">—</div></div>
+      <div class="stat stat-clickable" id="statAvgBox" title="Klicken zum Wechseln">
+        <div class="stat-label" id="statAvgLabel">Ø 10</div>
+        <div class="stat-value" id="statAvg">—</div>
       </div>
-      <div class="stat">
-        <div class="stat-label">Siegesserie</div>
-        <div class="stat-value" id="statSiege">0</div>
-      </div>
-      <div class="stat">
-        <div class="stat-label">Siege ges.</div>
-        <div class="stat-value" id="statWins">0</div>
-      </div>
-      <div class="stat">
-        <div class="stat-label">Spiele</div>
-        <div class="stat-value" id="statSpiele">0</div>
-      </div>
-      <div class="stat">
-        <div class="stat-label">Rekord</div>
-        <div class="stat-value" id="statRekord">0</div>
-      </div>
+      <div class="stat"><div class="stat-label">Spiele</div><div class="stat-value" id="statSpiele">0</div></div>
+      <div class="stat"><div class="stat-label">Rekord</div><div class="stat-value" id="statRekord">0</div></div>
     </div>
   </header>
 
-  <!-- Punkte: Meine Partei | Skat | Gegenpartei -->
-  <section class="score-panel">
+  <!-- ── Verlauf (Liniendiagramm) ───────────────────── -->
+  <div class="verlauf-section">
+    <button class="toggle-btn" id="btnVerlauf">
+      <span>📈 Verlauf</span>
+      <span class="toggle-arrow" id="verlaufArrow">▾</span>
+    </button>
+    <div class="verlauf-body" id="verlaufBody">
+      <div id="chartWrap"></div>
+    </div>
+  </div>
 
+  <!-- ── Score Panel ────────────────────────────────── -->
+  <section class="score-panel">
     <div class="party-score party-a">
       <div class="party-name">Meine Partei</div>
       <div class="score-row">
         <span class="score-label">Geschätzt</span>
-        <input type="number" id="inputA" class="score-input"
-               placeholder="?" min="0" max="120" inputmode="numeric">
+        <input type="number" id="inputA" class="score-input" placeholder="?" min="0" max="120" inputmode="numeric">
       </div>
       <div class="score-row">
         <span class="score-label">Ist</span>
@@ -576,11 +654,10 @@ body {
       </div>
     </div>
 
-    <div class="skat-divider">
+    <div class="skat-div">
       <div class="skat-title">SKAT</div>
       <div class="skat-cards" id="skatCards">
-        <div class="card-back"></div>
-        <div class="card-back"></div>
+        <div class="card-back"></div><div class="card-back"></div>
       </div>
       <div id="skatPunkte" class="skat-punkte">? Pkt.</div>
     </div>
@@ -589,54 +666,102 @@ body {
       <div class="party-name">Gegenpartei</div>
       <div class="score-row">
         <span class="score-label">Geschätzt</span>
-        <input type="number" id="inputB" class="score-input"
-               placeholder="?" min="0" max="120" inputmode="numeric">
+        <input type="number" id="inputB" class="score-input" placeholder="?" min="0" max="120" inputmode="numeric">
       </div>
       <div class="score-row">
         <span class="score-label">Ist</span>
         <span id="actualB" class="actual-value">—</span>
       </div>
     </div>
-
   </section>
 
-  <!-- Spieltisch -->
+  <!-- ── Kartenpunkte-Legende ───────────────────────── -->
+  <div class="legend-section">
+    <button class="toggle-btn" id="btnLegend">
+      <span>♠ Kartenpunkte</span>
+      <span class="toggle-arrow" id="legendArrow">▾</span>
+    </button>
+    <div class="legend-body" id="legendBody">
+      <div class="legend-grid">
+        <div class="legend-row"><span class="l-card">A</span><span class="l-pts">11 Pkt.</span></div>
+        <div class="legend-row"><span class="l-card">10</span><span class="l-pts">10 Pkt.</span></div>
+        <div class="legend-row"><span class="l-card">K</span><span class="l-pts">4 Pkt.</span></div>
+        <div class="legend-row"><span class="l-card">D</span><span class="l-pts">3 Pkt.</span></div>
+        <div class="legend-row"><span class="l-card">B</span><span class="l-pts">2 Pkt.</span></div>
+        <div class="legend-row"><span class="l-card">7–9</span><span class="l-pts">0 Pkt.</span></div>
+      </div>
+      <div class="legend-total">∑ 120 Punkte im Deck</div>
+    </div>
+  </div>
+
+  <!-- ── Spieltisch ─────────────────────────────────── -->
   <section class="game-table">
     <div class="side-indicator" id="indicatorA">
       <div class="side-label">A</div>
       <div class="side-arrow">◀</div>
     </div>
-
     <div class="tischmitte-wrap">
       <div class="tischmitte" id="tischmitte">
         <p class="tisch-hint">Klicke <strong>Start</strong> um zu beginnen</p>
       </div>
       <div id="roundDisplay" class="round-display"></div>
+      <div class="timer-wrap"><div id="timerDisplay" class="timer-display hidden"></div></div>
     </div>
-
     <div class="side-indicator" id="indicatorB">
       <div class="side-arrow">▶</div>
       <div class="side-label">B</div>
     </div>
   </section>
 
-  <!-- Ergebnis -->
+  <!-- ── Ergebnis ───────────────────────────────────── -->
   <div id="result" class="result-display"></div>
 
-  <!-- Buttons -->
+  <!-- ── Buttons ───────────────────────────────────── -->
   <div class="buttons">
     <button id="btnStart"  class="btn btn-start">Start</button>
     <button id="btnWeiter" class="btn btn-weiter hidden">Weiter</button>
     <button id="btnLoesen" class="btn btn-loesen hidden">Lösen</button>
   </div>
 
-  <!-- Version – klein und unauffällig -->
-  <p style="text-align:center;font-size:.55rem;letter-spacing:2px;color:#2d7a4a;
-             opacity:.65;margin-top:2px;user-select:none;">v1.5</p>
+  <p style="text-align:center;font-size:.52rem;letter-spacing:2px;color:#2d7a4a;opacity:.65;margin-top:2px;user-select:none;">v1.7</p>
 
 </div>
 
-<!-- Modal: Rang-Aufstieg / Rekord -->
+
+<!-- ── Settings overlay ─────────────────────────────────── -->
+<div id="settingsOverlay" class="settings-overlay hidden">
+  <div class="settings-box">
+    <div class="settings-title">⚙ Einstellungen</div>
+
+    <div>
+      <div class="settings-section-label">Schwierigkeitsgrad</div>
+      <div class="diff-buttons">
+        <button class="diff-btn" id="diffEasy">Leicht</button>
+        <button class="diff-btn active" id="diffNormal">Normal</button>
+        <button class="diff-btn" id="diffHard">Schwer</button>
+      </div>
+      <div class="diff-desc" id="diffDesc">Beide Werte müssen exakt stimmen.</div>
+    </div>
+
+    <div>
+      <div class="settings-section-label">Spielstand</div>
+      <div class="btn-reset-wrap">
+        <button class="btn btn-reset" id="btnReset">🗑 Spielstand zurücksetzen</button>
+        <div class="reset-confirm hidden" id="resetConfirm">
+          <span>Wirklich alles löschen?</span>
+          <div class="rc-row">
+            <button class="btn btn-danger" id="btnResetYes">Ja, löschen</button>
+            <button class="btn btn-weiter" id="btnResetNo" style="padding:9px 16px;font-size:.82rem;">Abbrechen</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn btn-start" id="btnSettingsClose">Fertig</button>
+  </div>
+</div>
+
+<!-- ── Rang-Modal ────────────────────────────────────────── -->
 <div id="modal" class="modal hidden">
   <div class="modal-box">
     <div class="modal-icon">🎉</div>
@@ -646,19 +771,34 @@ body {
   </div>
 </div>
 
+<!-- ── Onboarding ────────────────────────────────────────── -->
+<div id="onboarding" class="onboarding hidden">
+  <div class="onboard-box">
+    <div class="onboard-icon" id="obIcon">🃏</div>
+    <div class="onboard-title" id="obTitle"></div>
+    <ul class="onboard-list" id="obList"></ul>
+    <div class="onboard-dots" id="obDots"></div>
+    <div class="onboard-footer">
+      <button class="onboard-skip" id="obSkip">Überspringen</button>
+      <button class="btn btn-start" id="obNext">Weiter →</button>
+    </div>
+  </div>
+</div>
+
 <script>
 /* ============================================================
-   SKAT TRAINER  –  Spiellogik
-   Portierung von Rechner4.xlsm (Excel / VBA)
+   SKAT TRAINER v1.6
    ============================================================ */
 
-var SUITS     = ['♦','♥','♠','♣'];
+/* ── Deck constants ────────────────────────────────────── */
+var SUITS = ['♦','♥','♠','♣'];
 var CARD_VALS = [
-  {label:'7', pts:0 },{label:'8', pts:0 },{label:'9', pts:0 },
-  {label:'10',pts:10},{label:'B', pts:2 },{label:'D', pts:3 },
-  {label:'K', pts:4 },{label:'A', pts:11}
+  {label:'7',pts:0},{label:'8',pts:0},{label:'9',pts:0},
+  {label:'10',pts:10},{label:'B',pts:2},{label:'D',pts:3},
+  {label:'K',pts:4},{label:'A',pts:11}
 ];
 
+/* ── Rank system ───────────────────────────────────────── */
 var RANKS = [
   {name:'Anfänger',         min:0  },
   {name:'Skat-Bauer',       min:1  },
@@ -668,43 +808,95 @@ var RANKS = [
   {name:'Skat-Großmeister', min:72 },
   {name:'König Skat der I.',min:180}
 ];
-
 var RANK_MSGS = {
-  'Skat-Bauer':       'Herzlichen Glückwunsch, Skat-Bauer! Dein erster Sieg!',
-  'Kneipen-Dübler':   'Wow… 6 hintereinander… Das war wahrscheinlich nur Glück… Und wenn nicht, bist du immerhin kein Anfänger mehr. Bleib dran!',
-  'Kreuz-Bube':       'Immerhin ein Drittel eines Spiels am Stück. Für die Eckkneipe wird es schon reichen. Schaffst du auch ein ganzes Spiel am Stück?',
-  'Skat-Meister':     'Ein ganzes Spiel am Stück! Nicht schlecht… Dies war erst der Anfang!',
-  'Skat-Großmeister': 'Unglaublich! Skat-Großmeister! Die Karten verneigen sich vor dir.',
+  'Skat-Bauer':       'Herzlichen Glückwunsch, Skat-Bauer! Dein erster perfekter Sieg!',
+  'Kneipen-Dübler':   'Wow… 6 mal 100 % hintereinander… Bleib dran!',
+  'Kreuz-Bube':       'Immerhin ein Drittel eines Spiels am Stück perfekt. Schaffst du ein ganzes?',
+  'Skat-Meister':     'Ein ganzes Spiel am Stück perfekt! Dies war erst der Anfang…',
+  'Skat-Großmeister': 'Skat-Großmeister! Die Karten verneigen sich vor dir.',
   'König Skat der I.':'Die Skatwelt liegt dir zu Füßen!'
 };
 
-/* ---- State ---- */
+/* ── Onboarding slides ─────────────────────────────────── */
+var OB_SLIDES = [
+  {
+    icon: '🃏',
+    title: 'Das Spiel',
+    items: [
+      '32 Karten werden gemischt',
+      '2 Karten kommen als Skat zur Seite',
+      'In 10 Runden werden je 3 Karten aufgedeckt',
+      'Alle 120 Punkte verteilen sich auf beide Parteien und den Skat'
+    ]
+  },
+  {
+    icon: '🧠',
+    title: 'Deine Aufgabe',
+    items: [
+      'Beobachte jede Runde: 3 Karten erscheinen in der Tischmitte',
+      'Der rote ◀ oder ▶ Pfeil zeigt, wer die Punkte bekommt',
+      'Addiere die Punkte beider Parteien im Kopf über alle 10 Runden',
+      'Tipp: nutze die Kartenpunkte-Legende unten zum Nachschlagen'
+    ]
+  },
+  {
+    icon: '🏆',
+    title: 'Wertung',
+    items: [
+      'Am Ende trägst du deine Schätzung für beide Parteien ein',
+      'Du siehst wie viel % du richtig hattest',
+      'Nur 100 % = Sieg und verlängert deine Siegesserie',
+      'Baue deinen Rang auf – von Anfänger bis König Skat der I.'
+    ]
+  }
+];
+
+/* ── Game state ────────────────────────────────────────── */
 var state = {
   deck:[], scoreA:0, scoreB:0,
-  round:1, currentCards:[], currentParty:null, phase:'idle'
+  round:1, currentCards:[], currentParty:null,
+  skatPts:0, phase:'idle'
 };
 
-/* ---- Deck ---- */
+/* ── Deck ──────────────────────────────────────────────── */
 function createDeck() {
-  var d = [];
-  for (var s=0;s<SUITS.length;s++)
-    for (var v=0;v<CARD_VALS.length;v++)
-      d.push({suit:SUITS[s], label:CARD_VALS[v].label, pts:CARD_VALS[v].pts});
+  var d=[];
+  for(var s=0;s<SUITS.length;s++)
+    for(var v=0;v<CARD_VALS.length;v++)
+      d.push({suit:SUITS[s],label:CARD_VALS[v].label,pts:CARD_VALS[v].pts});
   return d;
 }
-
-function drawRandom(deck) {
-  var i = Math.floor(Math.random()*deck.length);
+function drawRandom(deck){
+  var i=Math.floor(Math.random()*deck.length);
   return deck.splice(i,1)[0];
 }
 
-/* ---- Progress ---- */
+/* ── Accuracy ──────────────────────────────────────────── */
+function calcAccuracy(ga, gb, actualA, actualB, skatPts) {
+  var distributed = 120 - skatPts;
+  if(distributed <= 0) return 100;
+  var delta = Math.abs(ga - actualA) + Math.abs(gb - actualB);
+  var pct   = 100 - (delta / distributed * 100);
+  return Math.max(0, Math.round(pct));
+}
+
+/* ── Progress ──────────────────────────────────────────── */
 function loadP() {
-  try { return JSON.parse(localStorage.getItem('skat_p')) || {streak:0,record:0,games:0,wins:0}; }
-  catch(e) { return {streak:0,record:0,games:0,wins:0}; }
+  try {
+    var saved = JSON.parse(localStorage.getItem('skat_p'));
+    if (!saved) return defP();
+    var defs = defP();
+    for (var k in defs) { if (saved[k] === undefined) saved[k] = defs[k]; }
+    return saved;
+  } catch(e) { return defP(); }
+}
+function defP() {
+  return {streak:0,record:0,games:0,wins:0,
+          history:[],lastWinDate:'',dayStreak:0,
+          avgMode:10,onboardingSeen:false,difficulty:'normal'};
 }
 function saveP(p) {
-  try { localStorage.setItem('skat_p', JSON.stringify(p)); } catch(e){}
+  try { localStorage.setItem('skat_p',JSON.stringify(p)); } catch(e){}
 }
 function getRank(s) {
   var r=RANKS[0];
@@ -712,213 +904,434 @@ function getRank(s) {
   return r;
 }
 
-/* ---- UI helpers ---- */
+function todayStr() {
+  return new Date().toISOString().slice(0,10);
+}
+function updateDayStreak(p) {
+  var today = todayStr();
+  if(!p.lastWinDate) {
+    p.dayStreak=1; p.lastWinDate=today;
+  } else if(p.lastWinDate === today) {
+    /* already won today – no change */
+  } else {
+    var prev = new Date(today); prev.setDate(prev.getDate()-1);
+    var yd   = prev.toISOString().slice(0,10);
+    p.dayStreak = (p.lastWinDate === yd) ? (p.dayStreak||0)+1 : 1;
+    p.lastWinDate = today;
+  }
+}
+function getAvg(history, n) {
+  var last = history.slice(-n);
+  if(!last.length) return null;
+  return Math.round(last.reduce(function(a,b){return a+b;},0)/last.length);
+}
+
+/* ── Chart (SVG) ───────────────────────────────────────── */
+function buildChart(history) {
+  var data = history.slice(-20);
+  var n    = data.length;
+  if(n < 2) {
+    return '<p style="color:rgba(255,255,255,.3);font-size:.75rem;'
+          +'text-align:center;padding:14px 0;">Noch zu wenig Daten – '
+          +'spiele mindestens 2 Spiele.</p>';
+  }
+  var W=300,H=80,pL=24,pR=8,pT=8,pB=18;
+  var cW=W-pL-pR, cH=H-pT-pB;
+  var pts=data.map(function(v,i){
+    return {
+      x: pL+(n>1?i/(n-1):0.5)*cW,
+      y: pT+cH-(v/100)*cH,
+      v: v
+    };
+  });
+  var svg='<svg viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg"'
+         +' style="width:100%;display:block;">';
+
+  /* Grid lines */
+  [0,50,100].forEach(function(pct){
+    var y=pT+cH-(pct/100)*cH;
+    var col = pct===100 ? 'rgba(46,204,113,.2)' : 'rgba(255,255,255,.07)';
+    var dash= pct===100 ? 'stroke-dasharray="3,3"' : '';
+    svg+='<line x1="'+pL+'" y1="'+y+'" x2="'+(W-pR)+'" y2="'+y
+        +'" stroke="'+col+'" stroke-width="'+(pct===100?'1.5':'1')+'" '+dash+'/>';
+    svg+='<text x="'+(pL-3)+'" y="'+(y+3)+'" text-anchor="end"'
+        +' font-size="7" fill="rgba(255,255,255,.28)">'+pct+'</text>';
+  });
+
+  /* Area fill */
+  var area=pts.map(function(p){return p.x+','+p.y;}).join(' ');
+  area=pL+','+(pT+cH)+' '+area+' '+(W-pR)+','+(pT+cH);
+  svg+='<polygon points="'+area+'" fill="rgba(201,162,39,.07)"/>';
+
+  /* Line */
+  var line=pts.map(function(p){return p.x+','+p.y;}).join(' ');
+  svg+='<polyline points="'+line+'" fill="none" stroke="rgba(201,162,39,.65)"'
+      +' stroke-width="1.5" stroke-linejoin="round"/>';
+
+  /* Dots */
+  pts.forEach(function(p){
+    var col = p.v===100 ? '#2ecc71' : p.v>=90 ? '#c9a227' : '#e74c3c';
+    svg+='<circle cx="'+p.x+'" cy="'+p.y+'" r="3" fill="'+col+'"'
+        +' stroke="rgba(0,0,0,.4)" stroke-width=".5"/>';
+  });
+
+  /* X axis: first and last game number */
+  var firstNum = history.length - n + 1;
+  var lastNum  = history.length;
+  svg+='<text x="'+pL+'" y="'+(H-3)+'" font-size="7" fill="rgba(255,255,255,.25)">'
+      +firstNum+'</text>';
+  svg+='<text x="'+(W-pR)+'" y="'+(H-3)+'" text-anchor="end" font-size="7"'
+      +' fill="rgba(255,255,255,.25)">'+lastNum+'</text>';
+
+  svg+='</svg>';
+  return svg;
+}
+
+function updateChart() {
+  var p = loadP();
+  G('chartWrap').innerHTML = buildChart(p.history);
+}
+
+/* ── UI helpers ────────────────────────────────────────── */
 function G(id){ return document.getElementById(id); }
 function show(id){ G(id).classList.remove('hidden'); }
 function hide(id){ G(id).classList.add('hidden'); }
 
-/**
- * Creates a card DOM element.
- * Uses hard-coded colors (no CSS vars) so dark-mode can never invert them.
- */
 function mkCard(card, small) {
   var red   = card.suit==='♥' || card.suit==='♦';
-  /* Dark cards: coral-red for red suits, warm cream for black suits */
-  var color = red ? '#e85858' : '#ede4d0';
-
+  var color = red ? '#c0392b' : '#1a1a2e';
   var d = document.createElement('div');
-  d.className = 'card' + (red ? ' red' : '') + (small ? ' small' : '');
-
-  /* Top corner */
-  var top = document.createElement('div');
-  top.className = 'card-corner';
-  top.innerHTML =
-    '<span class="c-label" style="color:'+color+'">'+card.label+'</span>'+
-    '<span class="c-suit"  style="color:'+color+'">'+card.suit+'</span>';
-
-  /* Center suit */
-  var mid = document.createElement('div');
-  mid.className = 'card-suit-center';
-  mid.style.color = color;
-  mid.textContent = card.suit;
-
-  /* Bottom corner (rotated) */
-  var bot = document.createElement('div');
-  bot.className = 'card-corner bot';
-  bot.innerHTML =
-    '<span class="c-label" style="color:'+color+'">'+card.label+'</span>'+
-    '<span class="c-suit"  style="color:'+color+'">'+card.suit+'</span>';
-
-  d.appendChild(top);
-  d.appendChild(mid);
-  d.appendChild(bot);
+  d.className = 'card'+(red?' red':'')+(small?' small':'');
+  var top=document.createElement('div'); top.className='card-corner';
+  top.innerHTML='<span class="c-label" style="color:'+color+'">'+card.label+'</span>'
+               +'<span class="c-suit"  style="color:'+color+'">'+card.suit+'</span>';
+  var mid=document.createElement('div'); mid.className='card-suit-center';
+  mid.style.color=color; mid.textContent=card.suit;
+  var bot=document.createElement('div'); bot.className='card-corner bot';
+  bot.innerHTML='<span class="c-label" style="color:'+color+'">'+card.label+'</span>'
+               +'<span class="c-suit"  style="color:'+color+'">'+card.suit+'</span>';
+  d.appendChild(top); d.appendChild(mid); d.appendChild(bot);
   return d;
 }
 
 function updateStats() {
-  var p = loadP(), r = getRank(p.streak);
+  var p=loadP(), r=getRank(p.streak);
   G('statRang').textContent   = r.name;
   G('statSiege').textContent  = p.streak;
-  G('statWins').textContent   = p.wins || 0;
+  G('statWins').textContent   = p.wins||0;
   G('statSpiele').textContent = p.games;
   G('statRekord').textContent = p.record;
+
+  /* Tagesstreak */
+  var today = todayStr();
+  var won   = p.lastWinDate === today;
+  var dEl   = G('statHeute');
+  if(won) {
+    dEl.textContent = '🔥 '+(p.dayStreak||1);
+    dEl.classList.add('fire');
+  } else {
+    dEl.textContent = '—';
+    dEl.classList.remove('fire');
+  }
+
+  /* Ø Schnitt */
+  var mode = p.avgMode || 10;
+  var real = Math.min(p.history.length, mode);
+  G('statAvgLabel').textContent = 'Ø '+real;
+  var avg = getAvg(p.history, mode);
+  G('statAvg').textContent = avg !== null ? avg+' %' : '—';
 }
 
-function showModal(title, msg) {
+function showRankModal(title, msg) {
   G('modalTitle').textContent = title;
   G('modalMsg').textContent   = msg;
-  G('modal').classList.remove('hidden');
+  show('modal');
 }
 
 function renderTable() {
-  var t = G('tischmitte');
-  t.innerHTML = '';
+  var t=G('tischmitte'); t.innerHTML='';
   for(var i=0;i<state.currentCards.length;i++)
-    t.appendChild(mkCard(state.currentCards[i], false));
+    t.appendChild(mkCard(state.currentCards[i],false));
 }
 
-/* ============================================================
-   GAME LOGIC  (mirrors the VBA procedures exactly)
-   ============================================================ */
+/* ── Onboarding ────────────────────────────────────────── */
+var obSlide = 0;
 
-function startGame() {                            /* Start_Click */
-  state.deck         = createDeck();
-  state.scoreA       = 0;
-  state.scoreB       = 0;
-  state.round        = 1;
-  state.currentCards = [];
-  state.currentParty = null;
-  state.phase        = 'playing';
+function showOnboarding() {
+  obSlide = 0;
+  renderSlide();
+  show('onboarding');
+}
 
-  var p = loadP();
-  p.games++;
+function renderSlide() {
+  var s = OB_SLIDES[obSlide];
+  G('obIcon').textContent  = s.icon;
+  G('obTitle').textContent = s.title;
+  var ul = G('obList'); ul.innerHTML = '';
+  s.items.forEach(function(item){
+    var li=document.createElement('li'); li.textContent=item; ul.appendChild(li);
+  });
+  /* Dots */
+  var dots=G('obDots'); dots.innerHTML='';
+  OB_SLIDES.forEach(function(_,i){
+    var dot=document.createElement('div');
+    dot.className='onboard-dot'+(i===obSlide?' active':'');
+    dots.appendChild(dot);
+  });
+  /* Button */
+  var isLast = obSlide === OB_SLIDES.length-1;
+  G('obNext').textContent = isLast ? 'Los geht\'s! 🎴' : 'Weiter →';
+}
+
+function closeOnboarding() {
+  hide('onboarding');
+  var p=loadP(); p.onboardingSeen=true; saveP(p);
+}
+
+G('obNext').addEventListener('click', function(){
+  if(obSlide < OB_SLIDES.length-1){ obSlide++; renderSlide(); }
+  else closeOnboarding();
+});
+G('obSkip').addEventListener('click', closeOnboarding);
+G('btnInfo').addEventListener('click', showOnboarding);
+
+/* ── Card legend toggle ────────────────────────────────── */
+function toggleSection(bodyId, arrowId) {
+  var body  = G(bodyId);
+  var arrow = G(arrowId);
+  var open  = body.classList.toggle('open');
+  arrow.classList.toggle('open', open);
+}
+
+G('btnLegend').addEventListener('click', function(){ toggleSection('legendBody','legendArrow'); });
+G('btnLegendIcon').addEventListener('click', function(){ toggleSection('legendBody','legendArrow'); });
+G('btnVerlauf').addEventListener('click',   function(){ toggleSection('verlaufBody','verlaufArrow'); updateChart(); });
+
+/* ── Ø mode cycling ────────────────────────────────────── */
+G('statAvgBox').addEventListener('click', function(){
+  var p=loadP();
+  var modes=[10,20,50];
+  var cur=modes.indexOf(p.avgMode||10);
+  p.avgMode=modes[(cur+1)%modes.length];
   saveP(p);
+  updateStats();
+});
 
-  G('inputA').value           = '';
-  G('inputB').value           = '';
-  G('inputA').disabled        = false;
-  G('inputB').disabled        = false;
-  G('actualA').textContent    = '—';
-  G('actualB').textContent    = '—';
-  G('actualA').className      = 'actual-value';
-  G('actualB').className      = 'actual-value';
-  G('skatPunkte').textContent = '? Pkt.';
-  G('skatCards').innerHTML    =
-    '<div class="card-back"></div><div class="card-back"></div>';
-  G('result').textContent     = '';
-  G('result').className       = 'result-display';
-  G('indicatorA').className   = 'side-indicator';
-  G('indicatorB').className   = 'side-indicator';
-  G('btnStart').textContent   = 'Neustart';
+/* ── Difficulty ────────────────────────────────────────── */
+function getDiff() { return loadP().difficulty || 'normal'; }
 
-  show('btnWeiter');
-  hide('btnLoesen');
+var DIFF_DESCS = {
+  easy:   'Nur der Wert von Meine Partei muss stimmen.',
+  normal: 'Beide Werte müssen exakt stimmen.',
+  hard:   '5 Sek. pro Runde · 20 Sek. für die Schätzung am Ende.'
+};
+
+/* ── Timer ─────────────────────────────────────────────── */
+var _timer = null;
+
+function clearTimer() {
+  if(_timer){ clearInterval(_timer); _timer=null; }
+  var el=G('timerDisplay');
+  el.textContent=''; el.className='timer-display hidden';
+}
+
+function startTimer(secs, onExpire) {
+  clearTimer();
+  var remaining=secs, el=G('timerDisplay');
+  el.className='timer-display';
+  el.textContent='⏱ '+remaining;
+  _timer=setInterval(function(){
+    remaining--;
+    el.textContent='⏱ '+remaining;
+    if(remaining<=3) el.className='timer-display urgent';
+    if(remaining<=0){ clearTimer(); onExpire(); }
+  },1000);
+}
+
+/* ── Settings ──────────────────────────────────────────── */
+function openSettings() {
+  var p=loadP(), d=p.difficulty||'normal';
+  ['diffEasy','diffNormal','diffHard'].forEach(function(id){ G(id).classList.remove('active'); });
+  G(d==='easy'?'diffEasy':d==='hard'?'diffHard':'diffNormal').classList.add('active');
+  G('diffDesc').textContent=DIFF_DESCS[d];
+  hide('resetConfirm');
+  show('settingsOverlay');
+}
+
+function setDiff(d) {
+  var p=loadP(); p.difficulty=d; saveP(p);
+  ['diffEasy','diffNormal','diffHard'].forEach(function(id){ G(id).classList.remove('active'); });
+  G(d==='easy'?'diffEasy':d==='hard'?'diffHard':'diffNormal').classList.add('active');
+  G('diffDesc').textContent=DIFF_DESCS[d];
+}
+
+G('btnSettings').addEventListener('click', openSettings);
+G('btnSettingsClose').addEventListener('click', function(){ hide('settingsOverlay'); });
+G('diffEasy').addEventListener('click',   function(){ setDiff('easy'); });
+G('diffNormal').addEventListener('click', function(){ setDiff('normal'); });
+G('diffHard').addEventListener('click',   function(){ setDiff('hard'); });
+
+G('btnReset').addEventListener('click', function(){
+  show('resetConfirm');
+});
+G('btnResetNo').addEventListener('click', function(){ hide('resetConfirm'); });
+G('btnResetYes').addEventListener('click', function(){
+  var fresh=defP();
+  fresh.onboardingSeen=true; // don't show onboarding after reset
+  saveP(fresh);
+  hide('settingsOverlay');
+  updateStats();
+  updateChart();
+  G('result').textContent=''; G('result').className='result-display';
+});
+
+/* ── Game logic ────────────────────────────────────────── */
+function startGame() {
+  clearTimer();
+  state.deck=createDeck(); state.scoreA=0; state.scoreB=0;
+  state.round=1; state.currentCards=[]; state.currentParty=null;
+  state.skatPts=0; state.phase='playing';
+
+  var p=loadP(); p.games++; saveP(p);
+
+  G('inputA').value=''; G('inputB').value='';
+  G('inputA').disabled=false; G('inputB').disabled=false;
+  G('actualA').textContent='—'; G('actualB').textContent='—';
+  G('actualA').className='actual-value'; G('actualB').className='actual-value';
+  G('skatPunkte').textContent='? Pkt.';
+  G('skatCards').innerHTML='<div class="card-back"></div><div class="card-back"></div>';
+  G('result').textContent=''; G('result').className='result-display';
+  G('indicatorA').className='side-indicator'; G('indicatorB').className='side-indicator';
+  G('btnStart').textContent='Neustart';
+
+  show('btnWeiter'); hide('btnLoesen');
   updateStats();
   nextRound();
 }
 
-function nextRound() {                            /* Weiter_Click */
+function nextRound() {
   var pts=0, drawn=[];
-  for(var i=0;i<3;i++){
-    var c = drawRandom(state.deck);
-    pts  += c.pts;
-    drawn.push(c);
-  }
-
-  var party = Math.random()<0.5 ? 'A' : 'B';     /* Int(2*Rnd)+1 */
-  if(party==='A') state.scoreA += pts;
-  else            state.scoreB += pts;
-
-  state.currentCards = drawn;
-  state.currentParty = party;
-
+  for(var i=0;i<3;i++){var c=drawRandom(state.deck); pts+=c.pts; drawn.push(c);}
+  var party=Math.random()<0.5?'A':'B';
+  if(party==='A') state.scoreA+=pts; else state.scoreB+=pts;
+  state.currentCards=drawn; state.currentParty=party;
   renderTable();
-  G('roundDisplay').textContent = 'Runde '+state.round+' / 10';
+  G('roundDisplay').textContent='Runde '+state.round+' / 10';
   state.round++;
-
-  G('indicatorA').className = 'side-indicator'+(party==='A'?' active':'');
-  G('indicatorB').className = 'side-indicator'+(party==='B'?' active':'');
-
-  if(state.deck.length===2){                      /* Skat übrig */
-    hide('btnWeiter');
-    show('btnLoesen');
+  G('indicatorA').className='side-indicator'+(party==='A'?' active':'');
+  G('indicatorB').className='side-indicator'+(party==='B'?' active':'');
+  if(state.deck.length===2){
+    hide('btnWeiter'); show('btnLoesen');
+    if(getDiff()==='hard') startTimer(20, function(){ if(state.phase==='playing') solve(); });
+  } else {
+    if(getDiff()==='hard') startTimer(5, function(){ if(state.phase==='playing') nextRound(); });
   }
 }
 
-function solve() {                                /* Loesen_Click */
+function solve() {
   var ra=G('inputA').value.trim(), rb=G('inputB').value.trim();
-
   if(ra===''||rb===''){
     G('result').textContent='Bitte beide Felder ausfüllen!';
-    G('result').className='result-display info';
-    return;
+    G('result').className='result-display info'; return;
   }
   var ga=parseInt(ra,10), gb=parseInt(rb,10);
   if(isNaN(ga)||isNaN(gb)){
     G('result').textContent='Nur Zahlen eingeben!';
-    G('result').className='result-display info';
-    return;
+    G('result').className='result-display info'; return;
   }
 
+  /* Skat */
   var s1=state.deck[0], s2=state.deck[1];
-  G('skatPunkte').textContent=(s1.pts+s2.pts)+' Pkt.';
+  state.skatPts = s1.pts+s2.pts;
+  G('skatPunkte').textContent=state.skatPts+' Pkt.';
   G('skatCards').innerHTML='';
   G('skatCards').appendChild(mkCard(s1,true));
   G('skatCards').appendChild(mkCard(s2,true));
 
-  G('actualA').textContent = state.scoreA;
-  G('actualB').textContent = state.scoreB;
-  G('inputA').disabled = true;
-  G('inputB').disabled = true;
+  /* Reveal */
+  G('actualA').textContent=state.scoreA;
+  G('actualB').textContent=state.scoreB;
+  G('inputA').disabled=true; G('inputB').disabled=true;
   hide('btnLoesen');
-  G('btnStart').textContent = 'Nächste Runde';
+  G('btnStart').textContent='Nächste Runde';
 
-  var correct = (ga===state.scoreA) && (gb===state.scoreB);
-  G('actualA').classList.add(ga===state.scoreA ? 'correct':'wrong');
-  G('actualB').classList.add(gb===state.scoreB ? 'correct':'wrong');
+  /* Mark each guess */
+  G('actualA').classList.add(ga===state.scoreA?'correct':'wrong');
+  G('actualB').classList.add(gb===state.scoreB?'correct':'wrong');
 
-  var p=loadP(), prevRank=getRank(p.streak), oldRec=p.record;
-
-  if(correct){
-    p.streak++;
-    p.wins = (p.wins || 0) + 1;       /* total wins – never resets */
-    if(p.streak>p.record) p.record=p.streak;
-    G('result').textContent='✓ Richtig!';
-    G('result').className='result-display correct';
+  /* Accuracy – adjusted for difficulty */
+  var diff = getDiff();
+  var acc, correct;
+  if(diff === 'easy') {
+    /* Leicht: only party A must be exact; accuracy reflects A only */
+    acc     = calcAccuracy(ga, state.scoreB, state.scoreA, state.scoreB, state.skatPts);
+    correct = (ga === state.scoreA);
   } else {
-    p.streak=0;
-    G('result').textContent='✗ Falsch!';
+    acc     = calcAccuracy(ga, gb, state.scoreA, state.scoreB, state.skatPts);
+    correct = (acc === 100);
+  }
+
+  /* Display */
+  if(correct){
+    G('result').textContent='✓ 100 %';
+    G('result').className='result-display correct';
+  } else if(acc >= 80){
+    G('result').textContent=acc+' %';
+    G('result').className='result-display near';
+  } else {
+    G('result').textContent=acc+' %';
     G('result').className='result-display wrong';
   }
 
+  /* Progress */
+  var p=loadP();
+  var prevRank=getRank(p.streak), oldRec=p.record;
+
+  if(correct){
+    p.streak++; p.wins=(p.wins||0)+1;
+    if(p.streak>p.record) p.record=p.streak;
+    updateDayStreak(p);
+  } else {
+    p.streak=0;
+  }
+
+  /* History (last 50) */
+  p.history.push(acc);
+  if(p.history.length>50) p.history.shift();
+
   saveP(p);
   updateStats();
+  updateChart();
   state.phase='solved';
 
+  /* Rank-up or record notifications */
   if(correct){
     var newRank=getRank(p.streak);
     if(newRank.name!==prevRank.name && RANK_MSGS[newRank.name]){
-      setTimeout(function(){ showModal('🎉 '+newRank.name+'!', RANK_MSGS[newRank.name]); },700);
+      setTimeout(function(){ showRankModal('🎉 '+newRank.name+'!',RANK_MSGS[newRank.name]); },700);
     } else if(p.streak>oldRec && p.streak>1){
       var diff=p.streak-oldRec;
       var msg=diff>1
-        ? p.streak+' hintereinander! '+diff+' mehr als dein letzter Rekord!'
-        : 'Und nochmal steigt dein Rekord um einen! Weitermachen!';
-      setTimeout(function(){ showModal('⭐ Neuer Rekord!', msg); },700);
+        ?p.streak+' hintereinander! '+diff+' mehr als dein letzter Rekord!'
+        :'Und nochmal steigt dein Rekord um einen!';
+      setTimeout(function(){ showRankModal('⭐ Neuer Rekord!',msg); },700);
     }
   }
 }
 
-/* ---- Events ---- */
+/* ── Events ────────────────────────────────────────────── */
 G('btnStart').addEventListener('click',  startGame);
-G('btnWeiter').addEventListener('click', nextRound);
-G('btnLoesen').addEventListener('click', solve);
-G('modalClose').addEventListener('click', function(){ G('modal').classList.add('hidden'); });
+G('btnWeiter').addEventListener('click', function(){ clearTimer(); nextRound(); });
+G('btnLoesen').addEventListener('click', function(){ clearTimer(); solve(); });
+G('modalClose').addEventListener('click', function(){ hide('modal'); });
 G('inputA').addEventListener('keydown', function(e){ if(e.key==='Enter') G('inputB').focus(); });
 G('inputB').addEventListener('keydown', function(e){ if(e.key==='Enter'&&state.phase!=='idle') solve(); });
 
-/* ---- Init ---- */
+/* ── Init ──────────────────────────────────────────────── */
 updateStats();
+updateChart();
+var _p = loadP();
+if(!_p.onboardingSeen) showOnboarding();
 </script>
 </body>
 </html>
