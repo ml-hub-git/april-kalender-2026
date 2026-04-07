@@ -617,22 +617,25 @@ body {
     </div>
     <div class="stats-row">
       <div class="stat"><div class="stat-label">Rang</div><div class="stat-value" id="statRang">Anfänger</div></div>
-      <div class="stat"><div class="stat-label">Siegesserie</div><div class="stat-value" id="statSiege">0</div></div>
-      <div class="stat"><div class="stat-label">Siege ges.</div><div class="stat-value" id="statWins">0</div></div>
-      <div class="stat"><div class="stat-label">Heute</div><div class="stat-value" id="statHeute">—</div></div>
+      <div class="stat stat-clickable" id="statBox1" title="Klicken zum Wechseln">
+        <div class="stat-label" id="statBox1Label">Serie</div>
+        <div class="stat-value" id="statBox1Val">0</div>
+      </div>
       <div class="stat stat-clickable" id="statAvgBox" title="Klicken zum Wechseln">
         <div class="stat-label" id="statAvgLabel">Ø 10</div>
         <div class="stat-value" id="statAvg">—</div>
       </div>
-      <div class="stat"><div class="stat-label">Spiele</div><div class="stat-value" id="statSpiele">0</div></div>
-      <div class="stat"><div class="stat-label">Rekord</div><div class="stat-value" id="statRekord">0</div></div>
+      <div class="stat stat-clickable" id="statBox2" title="Klicken zum Wechseln">
+        <div class="stat-label" id="statBox2Label">Heute</div>
+        <div class="stat-value" id="statBox2Val">—</div>
+      </div>
     </div>
   </header>
 
   <!-- ── Verlauf (Liniendiagramm) ───────────────────── -->
   <div class="verlauf-section">
     <button class="toggle-btn" id="btnVerlauf">
-      <span>📈 Verlauf</span>
+      <span>Verlauf</span>
       <span class="toggle-arrow" id="verlaufArrow">▾</span>
     </button>
     <div class="verlauf-body" id="verlaufBody">
@@ -723,7 +726,7 @@ body {
     <button id="btnLoesen" class="btn btn-loesen hidden">Lösen</button>
   </div>
 
-  <p style="text-align:center;font-size:.52rem;letter-spacing:2px;color:#2d7a4a;opacity:.65;margin-top:2px;user-select:none;">v1.7</p>
+  <p style="text-align:center;font-size:.52rem;letter-spacing:2px;color:#2d7a4a;opacity:.65;margin-top:2px;user-select:none;">v1.8</p>
 
 </div>
 
@@ -893,7 +896,7 @@ function loadP() {
 function defP() {
   return {streak:0,record:0,games:0,wins:0,
           history:[],lastWinDate:'',dayStreak:0,
-          avgMode:10,onboardingSeen:false,difficulty:'normal'};
+          avgMode:10,onboardingSeen:false,difficulty:'normal',box1Mode:'streak',box2Mode:'today'};
 }
 function saveP(p) {
   try { localStorage.setItem('skat_p',JSON.stringify(p)); } catch(e){}
@@ -1016,22 +1019,39 @@ function mkCard(card, small) {
 
 function updateStats() {
   var p=loadP(), r=getRank(p.streak);
-  G('statRang').textContent   = r.name;
-  G('statSiege').textContent  = p.streak;
-  G('statWins').textContent   = p.wins||0;
-  G('statSpiele').textContent = p.games;
-  G('statRekord').textContent = p.record;
+  G('statRang').textContent = r.name;
 
-  /* Tagesstreak */
+  /* Box 1: Serie ↔ Rekord */
+  var b1mode = p.box1Mode || 'streak';
+  if(b1mode === 'streak') {
+    G('statBox1Label').textContent = 'Serie';
+    G('statBox1Val').textContent   = p.streak;
+  } else {
+    G('statBox1Label').textContent = 'Rekord';
+    G('statBox1Val').textContent   = p.record;
+  }
+
+  /* Box 2: Heute ↔ Siege ges. ↔ Spiele */
   var today = todayStr();
   var won   = p.lastWinDate === today;
-  var dEl   = G('statHeute');
-  if(won) {
-    dEl.textContent = '🔥 '+(p.dayStreak||1);
-    dEl.classList.add('fire');
+  var b2mode = p.box2Mode || 'today';
+  if(b2mode === 'today') {
+    G('statBox2Label').textContent = 'Heute';
+    if(won) {
+      G('statBox2Val').textContent = '🔥 '+(p.dayStreak||1);
+      G('statBox2Val').classList.add('fire');
+    } else {
+      G('statBox2Val').textContent = '—';
+      G('statBox2Val').classList.remove('fire');
+    }
+  } else if(b2mode === 'wins') {
+    G('statBox2Label').textContent = 'Siege ges.';
+    G('statBox2Val').textContent   = p.wins||0;
+    G('statBox2Val').classList.remove('fire');
   } else {
-    dEl.textContent = '—';
-    dEl.classList.remove('fire');
+    G('statBox2Label').textContent = 'Spiele';
+    G('statBox2Val').textContent   = p.games;
+    G('statBox2Val').classList.remove('fire');
   }
 
   /* Ø Schnitt */
@@ -1113,8 +1133,19 @@ G('statAvgBox').addEventListener('click', function(){
   var modes=[10,20,50];
   var cur=modes.indexOf(p.avgMode||10);
   p.avgMode=modes[(cur+1)%modes.length];
-  saveP(p);
-  updateStats();
+  saveP(p); updateStats();
+});
+G('statBox1').addEventListener('click', function(){
+  var p=loadP();
+  p.box1Mode = (p.box1Mode||'streak')==='streak' ? 'record' : 'streak';
+  saveP(p); updateStats();
+});
+G('statBox2').addEventListener('click', function(){
+  var p=loadP();
+  var modes=['today','wins','games'];
+  var cur=modes.indexOf(p.box2Mode||'today');
+  p.box2Mode=modes[(cur+1)%modes.length];
+  saveP(p); updateStats();
 });
 
 /* ── Difficulty ────────────────────────────────────────── */
