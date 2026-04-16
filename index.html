@@ -345,6 +345,7 @@ body {
 
 /* ── Game Table ─────────────────────────────────────────── */
 .game-table {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -353,6 +354,45 @@ body {
   padding: 16px 10px;
   min-height: 148px;
   box-shadow: inset 0 0 40px rgba(0,0,0,.35), 0 4px 20px rgba(0,0,0,.4);
+  transition: box-shadow .35s;
+}
+.game-table.active-a {
+  box-shadow:
+    inset 0 0 40px rgba(0,0,0,.35),
+    0 4px 20px rgba(0,0,0,.4),
+    inset 40px 0 60px -30px rgba(255,90,90,.28);
+}
+.game-table.active-b {
+  box-shadow:
+    inset 0 0 40px rgba(0,0,0,.35),
+    0 4px 20px rgba(0,0,0,.4),
+    inset -40px 0 60px -30px rgba(255,90,90,.28);
+}
+.game-table::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 16px;
+  pointer-events: none;
+  opacity: 0;
+  mix-blend-mode: screen;
+}
+.game-table.glow-correct::after {
+  background: radial-gradient(ellipse at center, rgba(46,204,113,.6), transparent 65%);
+  animation: tableGlow 1.5s ease-out;
+}
+.game-table.glow-near::after {
+  background: radial-gradient(ellipse at center, rgba(201,162,39,.6), transparent 65%);
+  animation: tableGlow 1.5s ease-out;
+}
+.game-table.glow-wrong::after {
+  background: radial-gradient(ellipse at center, rgba(231,76,60,.6), transparent 65%);
+  animation: tableGlow 1.5s ease-out;
+}
+@keyframes tableGlow {
+  0%   { opacity: 0; }
+  30%  { opacity: .35; }
+  100% { opacity: 0; }
 }
 
 .side-indicator {
@@ -366,47 +406,81 @@ body {
 .side-indicator.active { filter: drop-shadow(0 0 8px rgba(255,80,80,.6)); }
 
 .tischmitte-wrap { flex:1; display:flex; flex-direction:column; align-items:center; gap:8px; }
-.tischmitte { display:flex; justify-content:center; gap:10px; flex-wrap:wrap; min-height:88px; align-items:center; }
+.tischmitte { display:flex; justify-content:center; gap:10px; flex-wrap:wrap; min-height:88px; align-items:center; perspective:600px; }
 .tisch-hint { color:rgba(255,255,255,.22); font-size:.78rem; font-style:italic; text-align:center; line-height:1.5; }
 .tisch-hint strong { font-style:normal; color:rgba(255,255,255,.38); }
 .round-display { font-size:.7rem; color:var(--muted); letter-spacing:1.5px; text-transform:uppercase; min-height:16px; }
 
 /* ── Playing cards ───────────────────────────────────────── */
 .card {
-  background: linear-gradient(145deg, #fffdf7 0%, #f5f0e2 100%);
-  color: #1a1a2e;
-  border: 1px solid #c8bfa0;
-  border-radius: 8px;
   width: 56px; height: 84px;
   flex-shrink: 0;
   position: relative;
+  user-select: none;
+  cursor: default;
+  font-weight: 800;
+  color: #1a1a2e;
+  animation: deal .35s ease-out both;
+  --rot: -6deg;
+}
+.card.red { color: #c0392b; }
+
+.card:nth-child(1){animation-delay:0s}
+.card:nth-child(2){animation-delay:.12s}
+.card:nth-child(3){animation-delay:.24s}
+
+@keyframes deal {
+  from { transform: translateY(-30px) rotate(var(--rot, -6deg)) scale(.7); opacity: 0; }
+  to   { transform: translateY(0)     rotate(0)                 scale(1);  opacity: 1; }
+}
+
+.card-inner {
+  position: absolute; inset: 0;
+  transform-style: preserve-3d;
+  transition: transform .5s ease-in-out;
+}
+.card.flipped .card-inner { transform: rotateY(180deg); }
+
+/* Stagger flip: 0.2s base delay + 0.1s offset per card */
+.card:nth-child(1).flipped .card-inner { transition-delay: .2s; }
+.card:nth-child(2).flipped .card-inner { transition-delay: .3s; }
+.card:nth-child(3).flipped .card-inner { transition-delay: .4s; }
+
+.card-face {
+  position: absolute; inset: 0;
+  border-radius: 8px;
+  -webkit-backface-visibility: hidden;
+          backface-visibility: hidden;
+  box-shadow: 3px 4px 14px rgba(0,0,0,.45),
+              0 1px 0 rgba(255,255,255,.7) inset,
+              0 0 0 1px rgba(0,0,0,.06) inset;
+}
+.card-back-face {
+  background:
+    repeating-linear-gradient(45deg, rgba(201,162,39,.18) 0 6px, transparent 6px 12px),
+    linear-gradient(145deg, #0f4a29 0%, #0a2e18 100%);
+  border: 1px solid rgba(201,162,39,.45);
+}
+.card-back-face::before {
+  content: '♠'; position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.6rem; color: rgba(201,162,39,.55);
+  text-shadow: 0 0 8px rgba(201,162,39,.3);
+}
+.card-front-face {
+  background: linear-gradient(145deg, #fffdf7 0%, #f5f0e2 100%);
+  border: 1px solid #c8bfa0;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   padding: 5px 5px 4px;
-  box-shadow: 3px 4px 14px rgba(0,0,0,.45),
-              0 1px 0 rgba(255,255,255,.7) inset,
-              0 0 0 1px rgba(0,0,0,.06) inset;
-  font-weight: 800;
-  user-select: none;
-  cursor: default;
-  animation: deal .3s ease-out both;
+  transform: rotateY(180deg);
 }
-.card::before {
+.card-front-face::before {
   content:''; position:absolute; inset:3px;
   border-radius:5px; border:1px solid rgba(201,162,39,.12);
   pointer-events:none;
 }
-.card:nth-child(1){animation-delay:0s}
-.card:nth-child(2){animation-delay:.08s}
-.card:nth-child(3){animation-delay:.16s}
-
-@keyframes deal {
-  from { transform:translateY(-26px) rotate(-7deg) scale(.72); opacity:0; }
-  to   { transform:translateY(0) rotate(0) scale(1); opacity:1; }
-}
-
-.card.red { color: #c0392b; }
 
 .card-corner {
   display: flex; flex-direction: column;
@@ -422,12 +496,24 @@ body {
   font-size:1.6rem; line-height:1; opacity:.9; pointer-events:none;
 }
 
+/* Small cards (skat reveal): flat, single-face, no flip */
 .card.small {
-  width:32px; height:46px; padding:3px 3px 2px; border-radius:5px;
+  width:32px; height:46px;
+  background: linear-gradient(145deg, #fffdf7 0%, #f5f0e2 100%);
+  border: 1px solid #c8bfa0;
+  border-radius:5px;
+  padding:3px 3px 2px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
   box-shadow:2px 2px 8px rgba(0,0,0,.4), 0 1px 0 rgba(255,255,255,.6) inset;
   animation:deal .4s ease-out both;
 }
-.card.small::before { inset:2px; border-radius:3px; }
+.card.small::before {
+  content:''; position:absolute; inset:2px;
+  border-radius:3px; border:1px solid rgba(201,162,39,.12);
+  pointer-events:none;
+}
 .card.small .c-label { font-size:.46rem; }
 .card.small .c-suit  { font-size:.36rem; }
 .card.small .card-suit-center { font-size:.95rem; }
@@ -563,14 +649,27 @@ body {
 
 /* ── Timer (Schwer mode) ───────────────────────────────── */
 .timer-wrap {
+  position: relative;
   display: flex; align-items: center; justify-content: center;
-  min-height: 22px;
+  width: 64px; height: 64px;
+  margin: 0 auto;
 }
-.timer-display {
-  font-size: 1.05rem; font-weight: 700; font-variant-numeric: tabular-nums;
+.timer-wrap.hidden { display: none !important; }
+.timer-ring {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+}
+#timerRingFg {
+  transition: stroke .25s linear;
+}
+.timer-text {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.1rem; font-weight: 700; font-variant-numeric: tabular-nums;
   color: var(--gold); letter-spacing: 1px;
+  pointer-events: none;
 }
-.timer-display.urgent { color: var(--err); animation: tpulse .5s ease-in-out infinite; }
+.timer-text.urgent { color: var(--err); animation: tpulse .5s ease-in-out infinite; }
 @keyframes tpulse { 0%,100%{opacity:1} 50%{opacity:.4} }
 
 /* ── Settings overlay ──────────────────────────────────── */
@@ -642,6 +741,68 @@ body {
 }
 .btn-danger:hover { background: #c0392b; }
 .rc-row { display: flex; gap: 8px; }
+
+/* ── Haptic toggle (Settings) ──────────────────────────── */
+.haptic-row {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 10px; padding: 4px 0;
+}
+.haptic-row label {
+  font-size: .82rem; color: var(--text); cursor: pointer;
+}
+.haptic-toggle {
+  appearance: none; -webkit-appearance: none;
+  position: relative;
+  width: 42px; height: 24px;
+  background: rgba(255,255,255,.12);
+  border: 1px solid rgba(255,255,255,.2);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background .2s;
+  flex-shrink: 0;
+}
+.haptic-toggle::before {
+  content: '';
+  position: absolute;
+  top: 2px; left: 2px;
+  width: 18px; height: 18px;
+  background: var(--text);
+  border-radius: 50%;
+  transition: transform .2s, background .2s;
+}
+.haptic-toggle:checked {
+  background: var(--gold-dim);
+  border-color: var(--gold);
+}
+.haptic-toggle:checked::before {
+  transform: translateX(18px);
+  background: var(--gold);
+}
+
+/* ── Streak flair (Effekt 6) ───────────────────────────── */
+.fire-emoji {
+  display: inline-block;
+  animation: fireFlicker .7s ease-in-out infinite alternate;
+  transform-origin: center bottom;
+}
+@keyframes fireFlicker {
+  0%   { transform: scale(1)    rotate(-2deg); filter: drop-shadow(0 0 2px rgba(255,140,0,.6)); }
+  100% { transform: scale(1.12) rotate(2deg);  filter: drop-shadow(0 0 8px rgba(255,200,0,.9)); }
+}
+.stat-value.streak-glow {
+  color: var(--gold-l);
+  animation: pulseGlow 1.5s ease-in-out infinite;
+}
+@keyframes pulseGlow {
+  0%,100% { text-shadow: 0 0 8px  rgba(224,186,80,.3); }
+  50%     { text-shadow: 0 0 18px rgba(224,186,80,.85); }
+}
+.shake { animation: shake .3s ease-in-out; }
+@keyframes shake {
+  0%,100% { transform: translateX(0); }
+  25%     { transform: translateX(-4px); }
+  75%     { transform: translateX(4px); }
+}
   </style>
 </head>
 <body>
@@ -739,7 +900,7 @@ body {
   </div>
 
   <!-- ── Spieltisch ─────────────────────────────────── -->
-  <section class="game-table">
+  <section class="game-table" id="gameTable">
     <div class="side-indicator" id="indicatorA">
       <div class="side-label">A</div>
       <div class="side-arrow">◀</div>
@@ -749,7 +910,17 @@ body {
         <p class="tisch-hint">Klicke <strong>Start</strong> um zu beginnen</p>
       </div>
       <div id="roundDisplay" class="round-display"></div>
-      <div class="timer-wrap"><div id="timerDisplay" class="timer-display hidden"></div></div>
+      <div class="timer-wrap hidden" id="timerWrap">
+        <svg class="timer-ring" viewBox="0 0 64 64" aria-hidden="true">
+          <circle cx="32" cy="32" r="28" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="4"/>
+          <circle id="timerRingFg" cx="32" cy="32" r="28" fill="none"
+                  stroke="#c9a227" stroke-width="4"
+                  stroke-dasharray="175.93" stroke-dashoffset="0"
+                  stroke-linecap="round"
+                  transform="rotate(-90 32 32)"/>
+        </svg>
+        <div id="timerDisplay" class="timer-text"></div>
+      </div>
     </div>
     <div class="side-indicator" id="indicatorB">
       <div class="side-arrow">▶</div>
@@ -767,7 +938,7 @@ body {
     <button id="btnLoesen" class="btn btn-loesen hidden">Lösen</button>
   </div>
 
-  <p style="text-align:center;font-size:.52rem;letter-spacing:2px;color:#2d7a4a;opacity:.65;margin-top:2px;user-select:none;">v1.9</p>
+  <p style="text-align:center;font-size:.52rem;letter-spacing:2px;color:#2d7a4a;opacity:.65;margin-top:2px;user-select:none;">v2.0</p>
 
 </div>
 
@@ -785,6 +956,14 @@ body {
         <button class="diff-btn" id="diffHard">Schwer</button>
       </div>
       <div class="diff-desc" id="diffDesc">Beide Werte müssen exakt stimmen.</div>
+    </div>
+
+    <div>
+      <div class="settings-section-label">Haptik</div>
+      <div class="haptic-row">
+        <label for="hapticToggle">Vibration auf Mobile</label>
+        <input type="checkbox" id="hapticToggle" class="haptic-toggle">
+      </div>
     </div>
 
     <div>
@@ -831,7 +1010,7 @@ body {
 
 <script>
 /* ============================================================
-   SKAT TRAINER v1.9
+   SKAT TRAINER v2.0
    ============================================================ */
 
 /* ── Deck constants ────────────────────────────────────── */
@@ -961,6 +1140,21 @@ function saveP(p) {
     }
   }
 }
+
+/* ── Haptic feedback (Vibration API) ──────────────────── */
+function loadH() {
+  try { return localStorage.getItem('skat_haptic') !== 'off'; }
+  catch(e) { return true; }
+}
+function saveH(on) {
+  try { localStorage.setItem('skat_haptic', on ? 'on' : 'off'); } catch(e){}
+}
+function haptic(pattern) {
+  try {
+    if(loadH() && typeof navigator!=='undefined' && navigator.vibrate)
+      navigator.vibrate(pattern);
+  } catch(e) {}
+}
 function getRank(s) {
   var r=RANKS[0];
   for(var i=0;i<RANKS.length;i++){if(s>=RANKS[i].min)r=RANKS[i];else break;}
@@ -1060,11 +1254,9 @@ function G(id){ return document.getElementById(id); }
 function show(id){ G(id).classList.remove('hidden'); }
 function hide(id){ G(id).classList.add('hidden'); }
 
-function mkCard(card, small) {
-  var red   = card.suit==='♥' || card.suit==='♦';
-  var color = red ? '#c0392b' : '#1a1a2e';
-  var d = document.createElement('div');
-  d.className = 'card'+(red?' red':'')+(small?' small':'');
+function mkCardFace(card, color) {
+  /* Baut das Front-Face (Corners + Suit-Center). Gibt ein DocumentFragment aus. */
+  var frag = document.createDocumentFragment();
   var top=document.createElement('div'); top.className='card-corner';
   top.innerHTML='<span class="c-label" style="color:'+color+'">'+card.label+'</span>'
                +'<span class="c-suit"  style="color:'+color+'">'+card.suit+'</span>';
@@ -1073,7 +1265,39 @@ function mkCard(card, small) {
   var bot=document.createElement('div'); bot.className='card-corner bot';
   bot.innerHTML='<span class="c-label" style="color:'+color+'">'+card.label+'</span>'
                +'<span class="c-suit"  style="color:'+color+'">'+card.suit+'</span>';
-  d.appendChild(top); d.appendChild(mid); d.appendChild(bot);
+  frag.appendChild(top); frag.appendChild(mid); frag.appendChild(bot);
+  return frag;
+}
+
+function mkCard(card, small) {
+  var red   = card.suit==='♥' || card.suit==='♦';
+  var color = red ? '#c0392b' : '#1a1a2e';
+  var d = document.createElement('div');
+  d.className = 'card'+(red?' red':'')+(small?' small':'');
+
+  if(small) {
+    /* Skat-Reveal: flache einseitige Karte */
+    d.appendChild(mkCardFace(card, color));
+    return d;
+  }
+
+  /* Tischkarte: Flip-Struktur mit Back- und Front-Face */
+  var rot = (Math.random()*16 - 8).toFixed(1) + 'deg';
+  d.style.setProperty('--rot', rot);
+
+  var inner = document.createElement('div');
+  inner.className = 'card-inner';
+
+  var back = document.createElement('div');
+  back.className = 'card-face card-back-face';
+
+  var front = document.createElement('div');
+  front.className = 'card-face card-front-face';
+  front.appendChild(mkCardFace(card, color));
+
+  inner.appendChild(back);
+  inner.appendChild(front);
+  d.appendChild(inner);
   return d;
 }
 
@@ -1083,35 +1307,41 @@ function updateStats() {
 
   /* Box 1: Serie ↔ Rekord */
   var b1mode = p.box1Mode || 'streak';
+  var b1 = G('statBox1Val');
   if(b1mode === 'streak') {
     G('statBox1Label').textContent = 'Serie';
-    G('statBox1Val').textContent   = p.streak;
+    b1.textContent = p.streak;
   } else {
     G('statBox1Label').textContent = 'Rekord';
-    G('statBox1Val').textContent   = p.record;
+    b1.textContent = p.record;
   }
+  /* Streak-Glow: ab 5er-Serie in Box 1 pulsierend leuchten (Effekt 6). */
+  if(b1mode === 'streak' && p.streak >= 5) b1.classList.add('streak-glow');
+  else                                     b1.classList.remove('streak-glow');
 
   /* Box 2: Heute ↔ Siege ges. ↔ Spiele */
   var today = todayStr();
   var won   = p.lastWinDate === today;
   var b2mode = p.box2Mode || 'today';
+  var b2 = G('statBox2Val');
   if(b2mode === 'today') {
     G('statBox2Label').textContent = 'Heute';
     if(won) {
-      G('statBox2Val').textContent = '🔥 '+(p.dayStreak||1);
-      G('statBox2Val').classList.add('fire');
+      /* innerHTML nur hier; Inhalt ist kontrolliert (Emoji + Zahl). */
+      b2.innerHTML = '<span class="fire-emoji">🔥</span> '+(p.dayStreak||1);
+      b2.classList.add('fire');
     } else {
-      G('statBox2Val').textContent = '—';
-      G('statBox2Val').classList.remove('fire');
+      b2.textContent = '—';
+      b2.classList.remove('fire');
     }
   } else if(b2mode === 'wins') {
     G('statBox2Label').textContent = 'Siege ges.';
-    G('statBox2Val').textContent   = p.wins||0;
-    G('statBox2Val').classList.remove('fire');
+    b2.textContent = p.wins||0;
+    b2.classList.remove('fire');
   } else {
     G('statBox2Label').textContent = 'Spiele';
-    G('statBox2Val').textContent   = p.games;
-    G('statBox2Val').classList.remove('fire');
+    b2.textContent = p.games;
+    b2.classList.remove('fire');
   }
 
   /* Ø Schnitt */
@@ -1130,8 +1360,17 @@ function showRankModal(title, msg) {
 
 function renderTable() {
   var t=G('tischmitte'); t.innerHTML='';
-  for(var i=0;i<state.currentCards.length;i++)
-    t.appendChild(mkCard(state.currentCards[i],false));
+  var cards=[];
+  for(var i=0;i<state.currentCards.length;i++){
+    var c=mkCard(state.currentCards[i],false);
+    t.appendChild(c);
+    cards.push(c);
+  }
+  /* Nach dem Reflow die Flip-Klasse setzen, damit die Deal-Animation
+     zuerst läuft und der Flip dann per transition-delay gestaffelt folgt. */
+  requestAnimationFrame(function(){
+    for(var i=0;i<cards.length;i++) cards[i].classList.add('flipped');
+  });
 }
 
 /* ── Onboarding ────────────────────────────────────────── */
@@ -1217,26 +1456,61 @@ var DIFF_DESCS = {
   hard:   '5 Sek. pro Runde · 20 Sek. für die Schätzung am Ende.'
 };
 
-/* ── Timer ─────────────────────────────────────────────── */
-var _timer = null;
+/* ── Timer (SVG ring, rAF) ─────────────────────────────── */
+var TIMER_CIRC = 175.93;   /* 2π·28 */
+var _timerRaf = null;
+var _timerStart = 0;
+var _timerDur = 0;
+var _timerCb = null;
 
 function clearTimer() {
-  if(_timer){ clearInterval(_timer); _timer=null; }
-  var el=G('timerDisplay');
-  el.textContent=''; el.className='timer-display hidden';
+  if(_timerRaf){ cancelAnimationFrame(_timerRaf); _timerRaf=null; }
+  _timerCb = null;
+  G('timerWrap').classList.add('hidden');
+  var txt=G('timerDisplay');
+  txt.textContent=''; txt.className='timer-text';
+  var fg=G('timerRingFg');
+  if(fg){ fg.setAttribute('stroke-dashoffset','0'); fg.setAttribute('stroke','#c9a227'); }
 }
 
 function startTimer(secs, onExpire) {
   clearTimer();
-  var remaining=secs, el=G('timerDisplay');
-  el.className='timer-display';
-  el.textContent='⏱ '+remaining;
-  _timer=setInterval(function(){
-    remaining--;
-    el.textContent='⏱ '+remaining;
-    if(remaining<=3) el.className='timer-display urgent';
-    if(remaining<=0){ clearTimer(); onExpire(); }
-  },1000);
+  _timerStart = (typeof performance!=='undefined' && performance.now) ? performance.now() : Date.now();
+  _timerDur   = secs*1000;
+  _timerCb    = onExpire;
+  G('timerWrap').classList.remove('hidden');
+  var txt = G('timerDisplay');
+  txt.textContent = secs;
+  txt.className = 'timer-text';
+
+  function tick() {
+    var now = (typeof performance!=='undefined' && performance.now) ? performance.now() : Date.now();
+    var elapsed = now - _timerStart;
+    var progress = Math.min(1, elapsed / _timerDur);
+    var remaining = Math.max(0, _timerDur - elapsed);
+    var fg = G('timerRingFg');
+    if(fg){
+      fg.setAttribute('stroke-dashoffset', (TIMER_CIRC * progress).toFixed(2));
+      /* Farbverlauf: gold → orange → rot */
+      var color = '#c9a227';
+      if(progress >= .8)      color = '#e74c3c';
+      else if(progress >= .5) color = '#e08e2a';
+      fg.setAttribute('stroke', color);
+    }
+    var secsLeft = Math.ceil(remaining/1000);
+    txt.textContent = secsLeft;
+    if(progress >= .8) txt.className = 'timer-text urgent';
+    else               txt.className = 'timer-text';
+
+    if(progress >= 1){
+      var cb = _timerCb;
+      clearTimer();
+      if(cb) cb();
+      return;
+    }
+    _timerRaf = requestAnimationFrame(tick);
+  }
+  _timerRaf = requestAnimationFrame(tick);
 }
 
 /* ── Settings ──────────────────────────────────────────── */
@@ -1245,6 +1519,7 @@ function openSettings() {
   ['diffEasy','diffNormal','diffHard'].forEach(function(id){ G(id).classList.remove('active'); });
   G(d==='easy'?'diffEasy':d==='hard'?'diffHard':'diffNormal').classList.add('active');
   G('diffDesc').textContent=DIFF_DESCS[d];
+  G('hapticToggle').checked = loadH();
   hide('resetConfirm');
   show('settingsOverlay');
 }
@@ -1264,6 +1539,7 @@ G('btnSettingsClose').addEventListener('click', function(){ hide('settingsOverla
 G('diffEasy').addEventListener('click',   function(){ setDiff('easy'); });
 G('diffNormal').addEventListener('click', function(){ setDiff('normal'); });
 G('diffHard').addEventListener('click',   function(){ setDiff('hard'); });
+G('hapticToggle').addEventListener('change', function(){ saveH(this.checked); haptic(20); });
 
 G('btnReset').addEventListener('click', function(){
   show('resetConfirm');
@@ -1296,6 +1572,7 @@ function startGame() {
   G('skatCards').innerHTML='<div class="card-back"></div><div class="card-back"></div>';
   G('result').textContent=''; G('result').className='result-display';
   G('indicatorA').className='side-indicator'; G('indicatorB').className='side-indicator';
+  G('gameTable').className='game-table';
   G('btnStart').textContent='Neustart';
 
   show('btnWeiter'); hide('btnLoesen');
@@ -1314,6 +1591,9 @@ function nextRound() {
   state.round++;
   G('indicatorA').className='side-indicator'+(party==='A'?' active':'');
   G('indicatorB').className='side-indicator'+(party==='B'?' active':'');
+  var tbl=G('gameTable');
+  tbl.classList.remove('active-a','active-b','glow-correct','glow-near','glow-wrong');
+  tbl.classList.add(party==='A' ? 'active-a' : 'active-b');
   if(state.deck.length===2){
     hide('btnWeiter'); show('btnLoesen');
     if(getDiff()==='hard') startTimer(20, function(){ if(state.phase==='playing') solve(); });
@@ -1383,6 +1663,18 @@ function solve() {
     G('result').className='result-display wrong';
   }
 
+  /* Tabletop-Glow (Effekt 4) */
+  var glowCls = correct ? 'glow-correct' : (acc >= 80 ? 'glow-near' : 'glow-wrong');
+  var tbl = G('gameTable');
+  tbl.classList.remove('active-a','active-b','glow-correct','glow-near','glow-wrong');
+  void tbl.offsetWidth;  /* Reflow erzwingen, damit die Animation sauber neu startet */
+  tbl.classList.add(glowCls);
+
+  /* Haptic (Effekt 5) */
+  if(correct)       haptic([50,30,50]);
+  else if(acc >= 80) haptic([80]);
+  else               haptic([200]);
+
   /* Progress */
   var p=loadP();
   var prevRank=getRank(p.streak), oldRec=p.record;
@@ -1392,7 +1684,15 @@ function solve() {
     if(p.streak>p.record) p.record=p.streak;
     updateDayStreak(p);
   } else {
+    var hadStreak = p.streak > 0;
     p.streak=0;
+    if(hadStreak){
+      /* Streak-Loss: Box 1 kurz wackeln lassen (Effekt 6). */
+      var sb = G('statBox1Val');
+      sb.classList.remove('shake');
+      void sb.offsetWidth;
+      sb.classList.add('shake');
+    }
   }
 
   /* History (last 50) */
@@ -1421,7 +1721,7 @@ function solve() {
 
 /* ── Events ────────────────────────────────────────────── */
 G('btnStart').addEventListener('click',  startGame);
-G('btnWeiter').addEventListener('click', function(){ clearTimer(); nextRound(); });
+G('btnWeiter').addEventListener('click', function(){ haptic(20); clearTimer(); nextRound(); });
 G('btnLoesen').addEventListener('click', function(){ clearTimer(); solve(); });
 G('modalClose').addEventListener('click', function(){ hide('modal'); });
 G('inputA').addEventListener('keydown', function(e){ if(e.key==='Enter') G('inputB').focus(); });
