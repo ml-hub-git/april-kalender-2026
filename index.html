@@ -195,9 +195,16 @@ body {
   letter-spacing: 1.5px;
   color: var(--muted);
   margin-bottom: 2px;
+  text-align: center; /* v2.3: zentriert über dem zentrierten Input */
 }
 
-.score-row { display: flex; align-items: center; gap: 6px; position: relative; }
+.score-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;  /* v2.3: Input-Gruppe unter dem Titel zentrieren */
+  gap: 6px;
+  position: relative;
+}
 
 /* ── Truth-Zahl rechts neben der Eingabe (Variante A) ── */
 .truth-arrow, .truth-num {
@@ -236,14 +243,6 @@ body {
   opacity: 1;
 }
 
-.score-label {
-  font-size: .6rem;
-  color: var(--muted);
-  text-transform: uppercase;
-  flex-shrink: 0;
-  width: 55px;
-}
-
 .score-input {
   width: 60px;
   padding: 7px 5px;
@@ -266,7 +265,7 @@ body {
 .score-input::-webkit-inner-spin-button,
 .score-input::-webkit-outer-spin-button { -webkit-appearance: none; }
 .score-input:focus { outline: none; border-color: var(--gold); background: rgba(255,255,255,.14); }
-.score-input:disabled { opacity: 1; cursor: default; } /* nach dem Lösen: Farben statt Grau-Dim */
+.score-input:disabled { opacity: 1; cursor: default; }
 
 /* Reveal-Zustände (Variante A) */
 .score-input.correct {
@@ -279,7 +278,7 @@ body {
   background: rgba(231,76,60,.2);
   border-color: var(--err);
   color: var(--err);
-  font-weight: 400;   /* rot = normal */
+  font-weight: 400;
 }
 .score-input.gold-glow {
   background: rgba(201,162,39,.28);
@@ -303,7 +302,6 @@ body {
   overflow: visible;
 }
 
-/* Ring: expandiert aus der Box-Mitte */
 .fx-ring {
   position: absolute;
   width: 20px; height: 20px;
@@ -318,7 +316,6 @@ body {
   100% { transform: translate(-50%, -50%) scale(5);  opacity: 0; border-width: 1px; }
 }
 
-/* Strahl: radial aus der Box-Mitte */
 .fx-ray {
   position: absolute;
   width: 2px; height: 0;
@@ -337,7 +334,6 @@ body {
   100% { height: var(--len, 72px); opacity: 0; }
 }
 
-/* Funke: radialer Punkt */
 .fx-spark {
   position: absolute;
   width: 4px; height: 4px;
@@ -408,7 +404,6 @@ body {
   padding: 8px 6px 7px;
 }
 
-/* Mini legend card – inherits .card but with fixed tiny size */
 .card-legend {
   background: linear-gradient(145deg, #fffdf7 0%, #f5f0e2 100%);
   color: #1a1a2e;
@@ -485,34 +480,8 @@ body {
     0 4px 20px rgba(0,0,0,.4),
     inset -40px 0 60px -30px rgba(255,90,90,.28);
 }
-.game-table::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: 16px;
-  pointer-events: none;
-  opacity: 0;
-  mix-blend-mode: screen;
-}
-.game-table.glow-correct::after {
-  background: radial-gradient(ellipse at center, rgba(46,204,113,.6), transparent 65%);
-  animation: tableGlow 1.5s ease-out;
-}
-.game-table.glow-near::after {
-  background: radial-gradient(ellipse at center, rgba(201,162,39,.6), transparent 65%);
-  animation: tableGlow 1.5s ease-out;
-}
-.game-table.glow-wrong::after {
-  background: radial-gradient(ellipse at center, rgba(231,76,60,.6), transparent 65%);
-  animation: tableGlow 1.5s ease-out;
-}
-@keyframes tableGlow {
-  0%   { opacity: 0; }
-  30%  { opacity: .35; }
-  100% { opacity: 0; }
-}
 
-/* ── Side indicators (Punkt 1: 90° gedrehte Labels) ─────── */
+/* ── Side indicators ─────────────────────────────────── */
 .side-indicator {
   display: flex; flex-direction: column; align-items: center;
   justify-content: center;
@@ -536,12 +505,10 @@ body {
   white-space: nowrap;
   line-height: 1;
 }
-/* Linke Seite: Text von unten nach oben (natürliche Leserichtung bei Kopfneigung nach links) */
 .side-indicator.left .side-label {
   writing-mode: vertical-rl;
   transform: rotate(180deg);
 }
-/* Rechte Seite: Text von oben nach unten */
 .side-indicator.right .side-label {
   writing-mode: vertical-rl;
 }
@@ -586,7 +553,6 @@ body {
 }
 .card.flipped .card-inner { transform: rotateY(180deg); }
 
-/* Stagger flip: 0.2s base delay + 0.1s offset per card */
 .card:nth-child(1).flipped .card-inner { transition-delay: .2s; }
 .card:nth-child(2).flipped .card-inner { transition-delay: .3s; }
 .card:nth-child(3).flipped .card-inner { transition-delay: .4s; }
@@ -641,7 +607,6 @@ body {
   font-size:1.6rem; line-height:1; opacity:.9; pointer-events:none;
 }
 
-/* Small cards (skat reveal): flat, single-face, no flip */
 .card.small {
   width:32px; height:46px;
   background: linear-gradient(145deg, #fffdf7 0%, #f5f0e2 100%);
@@ -663,21 +628,22 @@ body {
 .card.small .c-suit  { font-size:.36rem; }
 .card.small .card-suit-center { font-size:.95rem; }
 
-/* ── Result display ─────────────────────────────────────── */
+/* ── Result display (v2.3: sitzt jetzt IM Tisch) ────────── */
 .result-display {
   text-align: center;
   font-family: 'Playfair Display', serif;
-  font-size: 1.5rem;
+  font-size: 1.4rem;
   font-weight: 700;
   letter-spacing: 3px;
-  min-height: 40px;
-  line-height: 40px;
-  transition: all .3s;
+  min-height: 34px;
+  line-height: 34px;
+  transition: opacity .3s;
 }
+.result-display:empty { display: none; }
 .result-display.correct { color:var(--ok);   text-shadow:0 0 20px rgba(46,204,113,.4); }
-.result-display.near    { color:var(--near);  text-shadow:0 0 20px rgba(201,162,39,.35); }
-.result-display.wrong   { color:var(--err);   text-shadow:0 0 20px rgba(231,76,60,.4); }
-.result-display.info    { color:var(--gold);  font-size:.85rem; letter-spacing:1px; }
+.result-display.near    { color:var(--near); text-shadow:0 0 20px rgba(201,162,39,.35); }
+.result-display.wrong   { color:var(--err);  text-shadow:0 0 20px rgba(231,76,60,.4); }
+.result-display.info    { color:var(--gold); font-size:.8rem; letter-spacing:1px; line-height:1.3; min-height:auto; padding:4px 6px; }
 
 /* ── Buttons ────────────────────────────────────────────── */
 .buttons { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
@@ -782,7 +748,6 @@ body {
     padding:8px 0 2px; border-left:none; border-right:none;
     border-top:1px solid rgba(255,255,255,.07);
   }
-  .score-label { width:48px; font-size:.56rem; }
   .card { width:52px; height:78px; }
   .card .card-suit-center { font-size:1.45rem; }
   .side-indicator { width: 26px; }
@@ -928,7 +893,7 @@ body {
   background: var(--gold);
 }
 
-/* ── Streak flair (Effekt 6) ───────────────────────────── */
+/* ── Streak flair ──────────────────────────────────────── */
 .fire-emoji {
   display: inline-block;
   animation: fireFlicker .7s ease-in-out infinite alternate;
@@ -983,7 +948,7 @@ body {
     </div>
   </header>
 
-  <!-- ── Verlauf (Liniendiagramm) ───────────────────── -->
+  <!-- ── Verlauf ────────────────────────────────────── -->
   <div class="verlauf-section">
     <button class="toggle-btn" id="btnVerlauf">
       <span>Verlauf</span>
@@ -994,12 +959,11 @@ body {
     </div>
   </div>
 
-  <!-- ── Score Panel ────────────────────────────────── -->
+  <!-- ── Score Panel (v2.3: ohne Label, zentriert) ─── -->
   <section class="score-panel">
     <div class="party-score party-a">
       <div class="party-name">Meine Partei</div>
       <div class="score-row">
-        <span class="score-label">Geschätzt</span>
         <input type="number" id="inputA" class="score-input" placeholder="?" min="0" max="120" inputmode="numeric">
         <span class="truth-arrow" id="arrowA">→</span>
         <span id="actualA" class="truth-num"></span>
@@ -1017,7 +981,6 @@ body {
     <div class="party-score party-b">
       <div class="party-name">Gegenpartei</div>
       <div class="score-row">
-        <span class="score-label">Geschätzt</span>
         <input type="number" id="inputB" class="score-input" placeholder="?" min="0" max="120" inputmode="numeric">
         <span class="truth-arrow" id="arrowB">→</span>
         <span id="actualB" class="truth-num"></span>
@@ -1044,7 +1007,7 @@ body {
     </div>
   </div>
 
-  <!-- ── Spieltisch ─────────────────────────────────── -->
+  <!-- ── Spieltisch (v2.3: #result sitzt jetzt IM Tisch) ── -->
   <section class="game-table" id="gameTable">
     <div class="side-indicator left" id="indicatorA">
       <div class="side-arrow">◀</div>
@@ -1055,6 +1018,7 @@ body {
       <div class="tischmitte" id="tischmitte">
         <p class="tisch-hint">Klicke <strong>Start</strong> um zu beginnen</p>
       </div>
+      <div id="result" class="result-display"></div>
       <div class="timer-wrap hidden" id="timerWrap">
         <svg class="timer-ring" viewBox="0 0 64 64" aria-hidden="true">
           <circle cx="32" cy="32" r="28" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="4"/>
@@ -1073,17 +1037,14 @@ body {
     </div>
   </section>
 
-  <!-- ── Ergebnis ───────────────────────────────────── -->
-  <div id="result" class="result-display"></div>
-
-  <!-- ── Buttons ───────────────────────────────────── -->
+  <!-- ── Buttons (v2.3: direkt nach dem Tisch) ───────── -->
   <div class="buttons">
     <button id="btnStart"  class="btn btn-start">Start</button>
     <button id="btnWeiter" class="btn btn-weiter hidden">Weiter</button>
     <button id="btnLoesen" class="btn btn-loesen hidden">Lösen</button>
   </div>
 
-  <p style="text-align:center;font-size:.52rem;letter-spacing:2px;color:#2d7a4a;opacity:.65;margin-top:2px;user-select:none;">v2.2</p>
+  <p style="text-align:center;font-size:.52rem;letter-spacing:2px;color:#2d7a4a;opacity:.65;margin-top:2px;user-select:none;">v2.3</p>
 
 </div>
 
@@ -1155,10 +1116,13 @@ body {
 
 <script>
 /* ============================================================
-   SKAT TRAINER v2.2
+   SKAT TRAINER v2.3
+   Änderungen ggü. v2.2:
+   - Punkt 1: #result sitzt jetzt in .tischmitte-wrap (im Tisch)
+   - Punkt 2: Geschätzt-Labels entfernt, Inputs zentriert
+   - Tech-Debt: ungenutzte Tabletop-Glow-CSS + JS-References entfernt
    ============================================================ */
 
-/* ── Deck constants ────────────────────────────────────── */
 var SUITS = ['♦','♥','♠','♣'];
 var CARD_VALS = [
   {label:'7',pts:0},{label:'8',pts:0},{label:'9',pts:0},
@@ -1166,7 +1130,6 @@ var CARD_VALS = [
   {label:'K',pts:4},{label:'A',pts:11}
 ];
 
-/* ── Rank system ───────────────────────────────────────── */
 var RANKS = [
   {name:'Anfänger',         min:0  },
   {name:'Skat-Bauer',       min:1  },
@@ -1185,11 +1148,8 @@ var RANK_MSGS = {
   'König Skat der I.':'Die Skatwelt liegt dir zu Füßen!'
 };
 
-/* ── Onboarding slides ─────────────────────────────────── */
 var OB_SLIDES = [
-  {
-    icon: '🃏',
-    title: 'Das Spiel',
+  { icon: '🃏', title: 'Das Spiel',
     items: [
       '32 Karten werden gemischt',
       '2 Karten kommen als Skat zur Seite',
@@ -1197,9 +1157,7 @@ var OB_SLIDES = [
       'Alle 120 Punkte verteilen sich auf beide Parteien und den Skat'
     ]
   },
-  {
-    icon: '🧠',
-    title: 'Deine Aufgabe',
+  { icon: '🧠', title: 'Deine Aufgabe',
     items: [
       'Beobachte jede Runde: 3 Karten erscheinen in der Tischmitte',
       'Der rote ◀ oder ▶ Pfeil zeigt, wer die Punkte bekommt',
@@ -1207,9 +1165,7 @@ var OB_SLIDES = [
       'Tipp: nutze die Kartenpunkte-Legende unten zum Nachschlagen'
     ]
   },
-  {
-    icon: '🏆',
-    title: 'Wertung',
+  { icon: '🏆', title: 'Wertung',
     items: [
       'Am Ende trägst du deine Schätzung für beide Parteien ein',
       'Du siehst wie viel % du richtig hattest',
@@ -1219,14 +1175,12 @@ var OB_SLIDES = [
   }
 ];
 
-/* ── Game state ────────────────────────────────────────── */
 var state = {
   deck:[], scoreA:0, scoreB:0,
   round:1, currentCards:[], currentParty:null,
   skatPts:0, phase:'idle'
 };
 
-/* ── Deck ──────────────────────────────────────────────── */
 function createDeck() {
   var d=[];
   for(var s=0;s<SUITS.length;s++)
@@ -1239,17 +1193,12 @@ function drawRandom(deck){
   return deck.splice(i,1)[0];
 }
 
-/* ── Accuracy ──────────────────────────────────────────── */
-/* distributed = 120 − skatPts is always ≥ 98 (max skat = 22), so no zero-guard needed. */
 function calcAccuracy(ga, gb, actualA, actualB, skatPts) {
   var distributed = 120 - skatPts;
   var delta = Math.abs(ga - actualA) + Math.abs(gb - actualB);
   var pct   = 100 - (delta / distributed * 100);
   return Math.max(0, Math.round(pct));
 }
-/* Easy-Mode: nur Partei A zählt. Gleiche Bezugsskala wie calcAccuracy,
-   damit das numerische Ergebnis mit dem bisherigen (state.scoreB-Trick)
-   Verhalten übereinstimmt. */
 function calcAccuracyA(ga, actualA, skatPts) {
   var distributed = 120 - skatPts;
   var delta = Math.abs(ga - actualA);
@@ -1257,7 +1206,6 @@ function calcAccuracyA(ga, actualA, skatPts) {
   return Math.max(0, Math.round(pct));
 }
 
-/* ── Progress ──────────────────────────────────────────── */
 function loadP() {
   try {
     var saved = JSON.parse(localStorage.getItem('skat_p'));
@@ -1286,7 +1234,6 @@ function saveP(p) {
   }
 }
 
-/* ── Haptic feedback (Vibration API) ──────────────────── */
 function loadH() {
   try { return localStorage.getItem('skat_haptic') !== 'off'; }
   catch(e) { return true; }
@@ -1328,7 +1275,6 @@ function getAvg(history, n) {
   return Math.round(last.reduce(function(a,b){return a+b;},0)/last.length);
 }
 
-/* ── Chart (SVG) ───────────────────────────────────────── */
 function buildChart(history) {
   var data = history.slice(-20);
   var n    = data.length;
@@ -1340,16 +1286,10 @@ function buildChart(history) {
   var W=300,H=80,pL=24,pR=8,pT=8,pB=18;
   var cW=W-pL-pR, cH=H-pT-pB;
   var pts=data.map(function(v,i){
-    return {
-      x: pL+(n>1?i/(n-1):0.5)*cW,
-      y: pT+cH-(v/100)*cH,
-      v: v
-    };
+    return { x: pL+(n>1?i/(n-1):0.5)*cW, y: pT+cH-(v/100)*cH, v: v };
   });
   var svg='<svg viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg"'
          +' style="width:100%;display:block;">';
-
-  /* Grid lines */
   [0,50,100].forEach(function(pct){
     var y=pT+cH-(pct/100)*cH;
     var col = pct===100 ? 'rgba(46,204,113,.2)' : 'rgba(255,255,255,.07)';
@@ -1359,32 +1299,23 @@ function buildChart(history) {
     svg+='<text x="'+(pL-3)+'" y="'+(y+3)+'" text-anchor="end"'
         +' font-size="7" fill="rgba(255,255,255,.28)">'+pct+'</text>';
   });
-
-  /* Area fill */
   var area=pts.map(function(p){return p.x+','+p.y;}).join(' ');
   area=pL+','+(pT+cH)+' '+area+' '+(W-pR)+','+(pT+cH);
   svg+='<polygon points="'+area+'" fill="rgba(201,162,39,.07)"/>';
-
-  /* Line */
   var line=pts.map(function(p){return p.x+','+p.y;}).join(' ');
   svg+='<polyline points="'+line+'" fill="none" stroke="rgba(201,162,39,.65)"'
       +' stroke-width="1.5" stroke-linejoin="round"/>';
-
-  /* Dots */
   pts.forEach(function(p){
     var col = p.v===100 ? '#2ecc71' : p.v>=90 ? '#c9a227' : '#e74c3c';
     svg+='<circle cx="'+p.x+'" cy="'+p.y+'" r="3" fill="'+col+'"'
         +' stroke="rgba(0,0,0,.4)" stroke-width=".5"/>';
   });
-
-  /* X axis: first and last game number */
   var firstNum = history.length - n + 1;
   var lastNum  = history.length;
   svg+='<text x="'+pL+'" y="'+(H-3)+'" font-size="7" fill="rgba(255,255,255,.25)">'
       +firstNum+'</text>';
   svg+='<text x="'+(W-pR)+'" y="'+(H-3)+'" text-anchor="end" font-size="7"'
       +' fill="rgba(255,255,255,.25)">'+lastNum+'</text>';
-
   svg+='</svg>';
   return svg;
 }
@@ -1394,12 +1325,10 @@ function updateChart() {
   G('chartWrap').innerHTML = buildChart(p.history);
 }
 
-/* ── UI helpers ────────────────────────────────────────── */
 function G(id){ return document.getElementById(id); }
 function show(id){ G(id).classList.remove('hidden'); }
 function hide(id){ G(id).classList.add('hidden'); }
 
-/* Reveal-Helpers (Variante A) */
 function resetRevealUI() {
   ['inputA','inputB'].forEach(function(id){
     var el = G(id);
@@ -1418,11 +1347,9 @@ function resetRevealUI() {
 }
 
 function revealTruth(side, actualValue) {
-  /* side = 'A' | 'B'. Truth-Zahl + Pfeil einblenden. */
   var arrow = G('arrowA'); var num = G('actualA');
   if(side === 'B') { arrow = G('arrowB'); num = G('actualB'); }
   num.textContent = actualValue;
-  /* rAF damit das leer→befüllt den transition-start sauber triggert */
   requestAnimationFrame(function(){
     arrow.classList.add('show');
     num.classList.add('show');
@@ -1434,27 +1361,21 @@ function clearFxLayers() {
   for(var i=0;i<layers.length;i++) layers[i].parentNode.removeChild(layers[i]);
 }
 
-/* Gold-Burst: Ring → Strahlen → Funken, zentriert auf einem Element.
-   Das Element bekommt einen .fx-layer als Geschwister im Eltern-container,
-   der sich exakt über die Box legt. Nach 1.2 s wird der Layer entfernt. */
 function fireGoldBurst(targetEl) {
-  var parent = targetEl.parentNode;   /* .score-row, hat position:relative */
+  var parent = targetEl.parentNode;
   var layer = document.createElement('div');
   layer.className = 'fx-layer';
   parent.appendChild(layer);
 
-  /* Mittelpunkt der Box relativ zur .score-row */
   var cx = targetEl.offsetLeft + targetEl.offsetWidth / 2;
   var cy = targetEl.offsetTop  + targetEl.offsetHeight / 2;
 
-  /* --- Ring (sofort) --- */
   var ring = document.createElement('div');
   ring.className = 'fx-ring';
   ring.style.left = cx + 'px';
   ring.style.top  = cy + 'px';
   layer.appendChild(ring);
 
-  /* --- Strahlen (30ms Versatz) --- */
   setTimeout(function(){
     var N = 12;
     for(var i=0;i<N;i++){
@@ -1471,7 +1392,6 @@ function fireGoldBurst(targetEl) {
     }
   }, 30);
 
-  /* --- Funken (50ms Versatz) --- */
   setTimeout(function(){
     var N = 14;
     for(var i=0;i<N;i++){
@@ -1489,14 +1409,12 @@ function fireGoldBurst(targetEl) {
     }
   }, 50);
 
-  /* Aufräumen nach vollem Ablauf */
   setTimeout(function(){
     if(layer.parentNode) layer.parentNode.removeChild(layer);
   }, 1400);
 }
 
 function mkCardFace(card, color) {
-  /* Baut das Front-Face (Corners + Suit-Center). Gibt ein DocumentFragment aus. */
   var frag = document.createDocumentFragment();
   var top=document.createElement('div'); top.className='card-corner';
   top.innerHTML='<span class="c-label" style="color:'+color+'">'+card.label+'</span>'
@@ -1517,12 +1435,10 @@ function mkCard(card, small) {
   d.className = 'card'+(red?' red':'')+(small?' small':'');
 
   if(small) {
-    /* Skat-Reveal: flache einseitige Karte */
     d.appendChild(mkCardFace(card, color));
     return d;
   }
 
-  /* Tischkarte: Flip-Struktur mit Back- und Front-Face */
   var rot = (Math.random()*16 - 8).toFixed(1) + 'deg';
   d.style.setProperty('--rot', rot);
 
@@ -1546,7 +1462,6 @@ function updateStats() {
   var p=loadP(), r=getRank(p.streak);
   G('statRang').textContent = r.name;
 
-  /* Box 1: Serie ↔ Rekord */
   var b1mode = p.box1Mode || 'streak';
   var b1 = G('statBox1Val');
   if(b1mode === 'streak') {
@@ -1556,11 +1471,9 @@ function updateStats() {
     G('statBox1Label').textContent = 'Rekord';
     b1.textContent = p.record;
   }
-  /* Streak-Glow: ab 5er-Serie in Box 1 pulsierend leuchten (Effekt 6). */
   if(b1mode === 'streak' && p.streak >= 5) b1.classList.add('streak-glow');
   else                                     b1.classList.remove('streak-glow');
 
-  /* Box 2: Heute ↔ Siege ges. ↔ Spiele */
   var today = todayStr();
   var won   = p.lastWinDate === today;
   var b2mode = p.box2Mode || 'today';
@@ -1568,7 +1481,6 @@ function updateStats() {
   if(b2mode === 'today') {
     G('statBox2Label').textContent = 'Heute';
     if(won) {
-      /* innerHTML nur hier; Inhalt ist kontrolliert (Emoji + Zahl). */
       b2.innerHTML = '<span class="fire-emoji">🔥</span> '+(p.dayStreak||1);
       b2.classList.add('fire');
     } else {
@@ -1585,7 +1497,6 @@ function updateStats() {
     b2.classList.remove('fire');
   }
 
-  /* Ø Schnitt */
   var mode = p.avgMode || 10;
   var real = Math.min(p.history.length, mode);
   G('statAvgLabel').textContent = 'Ø '+real;
@@ -1607,14 +1518,11 @@ function renderTable() {
     t.appendChild(c);
     cards.push(c);
   }
-  /* Nach dem Reflow die Flip-Klasse setzen, damit die Deal-Animation
-     zuerst läuft und der Flip dann per transition-delay gestaffelt folgt. */
   requestAnimationFrame(function(){
     for(var i=0;i<cards.length;i++) cards[i].classList.add('flipped');
   });
 }
 
-/* ── Onboarding ────────────────────────────────────────── */
 var obSlide = 0;
 
 function showOnboarding() {
@@ -1631,14 +1539,12 @@ function renderSlide() {
   s.items.forEach(function(item){
     var li=document.createElement('li'); li.textContent=item; ul.appendChild(li);
   });
-  /* Dots */
   var dots=G('obDots'); dots.innerHTML='';
   OB_SLIDES.forEach(function(_,i){
     var dot=document.createElement('div');
     dot.className='onboard-dot'+(i===obSlide?' active':'');
     dots.appendChild(dot);
   });
-  /* Button */
   var isLast = obSlide === OB_SLIDES.length-1;
   G('obNext').textContent = isLast ? 'Los geht\'s! 🎴' : 'Weiter →';
 }
@@ -1655,7 +1561,6 @@ G('obNext').addEventListener('click', function(){
 G('obSkip').addEventListener('click', closeOnboarding);
 G('btnInfo').addEventListener('click', showOnboarding);
 
-/* ── Card legend toggle ────────────────────────────────── */
 function toggleSection(bodyId, arrowId) {
   var body  = G(bodyId);
   var arrow = G(arrowId);
@@ -1667,7 +1572,6 @@ G('btnLegend').addEventListener('click', function(){ toggleSection('legendBody',
 G('btnLegendIcon').addEventListener('click', function(){ toggleSection('legendBody','legendArrow'); });
 G('btnVerlauf').addEventListener('click',   function(){ toggleSection('verlaufBody','verlaufArrow'); updateChart(); });
 
-/* ── Ø mode cycling ────────────────────────────────────── */
 G('statAvgBox').addEventListener('click', function(){
   var p=loadP();
   var modes=[10,20,50];
@@ -1688,7 +1592,6 @@ G('statBox2').addEventListener('click', function(){
   saveP(p); updateStats();
 });
 
-/* ── Difficulty ────────────────────────────────────────── */
 function getDiff() { return loadP().difficulty || 'normal'; }
 
 var DIFF_DESCS = {
@@ -1697,8 +1600,7 @@ var DIFF_DESCS = {
   hard:   '5 Sek. pro Runde · 20 Sek. für die Schätzung am Ende.'
 };
 
-/* ── Timer (SVG ring, rAF) ─────────────────────────────── */
-var TIMER_CIRC = 175.93;   /* 2π·28 */
+var TIMER_CIRC = 175.93;
 var _timerRaf = null;
 var _timerStart = 0;
 var _timerDur = 0;
@@ -1732,7 +1634,6 @@ function startTimer(secs, onExpire) {
     var fg = G('timerRingFg');
     if(fg){
       fg.setAttribute('stroke-dashoffset', (TIMER_CIRC * progress).toFixed(2));
-      /* Farbverlauf: gold → orange → rot */
       var color = '#c9a227';
       if(progress >= .8)      color = '#e74c3c';
       else if(progress >= .5) color = '#e08e2a';
@@ -1754,7 +1655,6 @@ function startTimer(secs, onExpire) {
   _timerRaf = requestAnimationFrame(tick);
 }
 
-/* ── Settings ──────────────────────────────────────────── */
 function openSettings() {
   var p=loadP(), d=p.difficulty||'normal';
   ['diffEasy','diffNormal','diffHard'].forEach(function(id){ G(id).classList.remove('active'); });
@@ -1766,8 +1666,6 @@ function openSettings() {
 }
 
 function setDiff(d) {
-  /* Laufenden Timer stoppen, damit ein zuvor gestarteter 5/20-Sek-Timer
-     keine Runde mehr triggert, sobald die Schwierigkeit gewechselt wurde. */
   clearTimer();
   var p=loadP(); p.difficulty=d; saveP(p);
   ['diffEasy','diffNormal','diffHard'].forEach(function(id){ G(id).classList.remove('active'); });
@@ -1788,7 +1686,7 @@ G('btnReset').addEventListener('click', function(){
 G('btnResetNo').addEventListener('click', function(){ hide('resetConfirm'); });
 G('btnResetYes').addEventListener('click', function(){
   var fresh=defP();
-  fresh.onboardingSeen=true; // don't show onboarding after reset
+  fresh.onboardingSeen=true;
   saveP(fresh);
   hide('settingsOverlay');
   updateStats();
@@ -1796,7 +1694,6 @@ G('btnResetYes').addEventListener('click', function(){
   G('result').textContent=''; G('result').className='result-display';
 });
 
-/* ── Game logic ────────────────────────────────────────── */
 function startGame() {
   clearTimer();
   state.deck=createDeck(); state.scoreA=0; state.scoreB=0;
@@ -1814,7 +1711,6 @@ function startGame() {
   G('gameTable').className='game-table';
   G('btnStart').textContent='Neustart';
 
-  /* Reveal-UI zurücksetzen (Variante A) */
   resetRevealUI();
 
   show('btnWeiter'); hide('btnLoesen');
@@ -1834,7 +1730,7 @@ function nextRound() {
   G('indicatorA').className='side-indicator left'+(party==='A'?' active':'');
   G('indicatorB').className='side-indicator right'+(party==='B'?' active':'');
   var tbl=G('gameTable');
-  tbl.classList.remove('active-a','active-b','glow-correct','glow-near','glow-wrong');
+  tbl.classList.remove('active-a','active-b');
   tbl.classList.add(party==='A' ? 'active-a' : 'active-b');
   if(state.deck.length===2){
     hide('btnWeiter'); show('btnLoesen');
@@ -1850,7 +1746,6 @@ function solve() {
     G('result').textContent='Bitte beide Felder ausfüllen!';
     G('result').className='result-display info'; return;
   }
-  /* Nur nichtnegative Ganzzahlen im Bereich 0–120 akzeptieren. */
   if(!/^\d+$/.test(ra) || !/^\d+$/.test(rb)){
     G('result').textContent='Nur ganze Zahlen zwischen 0 und 120!';
     G('result').className='result-display info'; return;
@@ -1861,7 +1756,6 @@ function solve() {
     G('result').className='result-display info'; return;
   }
 
-  /* Skat */
   var s1=state.deck[0], s2=state.deck[1];
   state.skatPts = s1.pts+s2.pts;
   G('skatPunkte').textContent=state.skatPts+' Pkt.';
@@ -1869,20 +1763,16 @@ function solve() {
   G('skatCards').appendChild(mkCard(s1,true));
   G('skatCards').appendChild(mkCard(s2,true));
 
-  /* Reveal: Inputs deaktivieren, Truth-Zahlen vorbereiten */
   G('inputA').disabled=true; G('inputB').disabled=true;
   hide('btnLoesen');
   G('btnStart').textContent='Nächste Runde';
 
-  /* Skat-Punkte einblenden */
   G('skatPunkte').classList.add('revealed');
 
-  /* Einzelne Treffer prüfen (unabhängig vom Schwierigkeitsgrad) */
   var aOk = (ga === state.scoreA);
   var bOk = (gb === state.scoreB);
   var bothExact = aOk && bOk;
 
-  /* Variante A: Eingabebox einfärben, bei Fehler die Wahrheit daneben */
   var inA = G('inputA'), inB = G('inputB');
   if(bothExact){
     inA.classList.add('gold-glow');
@@ -1894,7 +1784,6 @@ function solve() {
     if(!bOk) revealTruth('B', state.scoreB);
   }
 
-  /* Gold-Burst bei beiden richtig — Ring + Strahlen + Funken */
   if(bothExact){
     setTimeout(function(){
       fireGoldBurst(inA);
@@ -1902,11 +1791,9 @@ function solve() {
     }, 250);
   }
 
-  /* Accuracy – adjusted for difficulty */
   var diff = getDiff();
   var acc, correct;
   if(diff === 'easy') {
-    /* Leicht: nur Partei A zählt. */
     acc     = calcAccuracyA(ga, state.scoreA, state.skatPts);
     correct = aOk;
   } else {
@@ -1914,7 +1801,6 @@ function solve() {
     correct = (acc === 100);
   }
 
-  /* Display */
   if(correct){
     G('result').textContent='✓ 100 %';
     G('result').className='result-display correct';
@@ -1926,18 +1812,13 @@ function solve() {
     G('result').className='result-display wrong';
   }
 
-  /* Active-Side-Highlight entfernen (der Tabletop-Glow entfällt in v2.2 —
-     Funken + Strahlen + Ring übernehmen die visuelle Rückmeldung bei Gold,
-     Einfärbung der Box reicht bei Teiltreffern/Fehlern). */
   var tbl = G('gameTable');
-  tbl.classList.remove('active-a','active-b','glow-correct','glow-near','glow-wrong');
+  tbl.classList.remove('active-a','active-b');
 
-  /* Haptic */
   if(correct)       haptic([50,30,50]);
   else if(acc >= 80) haptic([80]);
   else               haptic([200]);
 
-  /* Progress */
   var p=loadP();
   var prevRank=getRank(p.streak), oldRec=p.record;
 
@@ -1949,7 +1830,6 @@ function solve() {
     var hadStreak = p.streak > 0;
     p.streak=0;
     if(hadStreak){
-      /* Streak-Loss: Box 1 kurz wackeln lassen (Effekt 6). */
       var sb = G('statBox1Val');
       sb.classList.remove('shake');
       void sb.offsetWidth;
@@ -1957,7 +1837,6 @@ function solve() {
     }
   }
 
-  /* History (last 50) */
   p.history.push(acc);
   if(p.history.length>50) p.history.shift();
 
@@ -1966,7 +1845,6 @@ function solve() {
   updateChart();
   state.phase='solved';
 
-  /* Rank-up or record notifications */
   if(correct){
     var newRank=getRank(p.streak);
     if(newRank.name!==prevRank.name && RANK_MSGS[newRank.name]){
@@ -1981,7 +1859,6 @@ function solve() {
   }
 }
 
-/* ── Events ────────────────────────────────────────────── */
 G('btnStart').addEventListener('click',  startGame);
 G('btnWeiter').addEventListener('click', function(){ haptic(20); clearTimer(); nextRound(); });
 G('btnLoesen').addEventListener('click', function(){ clearTimer(); solve(); });
@@ -1989,7 +1866,6 @@ G('modalClose').addEventListener('click', function(){ hide('modal'); });
 G('inputA').addEventListener('keydown', function(e){ if(e.key==='Enter') G('inputB').focus(); });
 G('inputB').addEventListener('keydown', function(e){ if(e.key==='Enter'&&state.phase!=='idle') solve(); });
 
-/* ── Init ──────────────────────────────────────────────── */
 updateStats();
 updateChart();
 var _p = loadP();
