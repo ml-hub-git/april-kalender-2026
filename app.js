@@ -1,5 +1,5 @@
 /* ============================================================
-   SKAT TRAINER v3.0
+   SKAT TRAINER v3.0.1
    Änderungen ggü. v2.3:
    - Persistenter Rang: einmal erreichte Ränge bleiben erhalten,
      auch wenn der Streak bricht. Nur Difficulty-Wechsel setzt zurück.
@@ -24,6 +24,7 @@ var RANKS = [
   {name:'König Skat der I.',min:180}
 ];
 var RANK_MSGS = {
+  'Anfänger':         'Jede Skat-Karriere beginnt hier. Dein erster perfekter Sieg wartet.',
   'Skat-Bauer':       'Herzlichen Glückwunsch, Skat-Bauer! Dein erster perfekter Sieg!',
   'Kneipen-Dübler':   'Wow… 6 mal 100 % hintereinander… Bleib dran!',
   'Kreuz-Bube':       'Immerhin ein Drittel eines Spiels am Stück perfekt. Schaffst du ein ganzes?',
@@ -353,7 +354,7 @@ function updateStats() {
   var currentIdx = RANKS.indexOf(getRank(p.streak));
   var displayIdx = Math.max(currentIdx, p.highestRankIdx || 0);
   var r = RANKS[displayIdx];
-  G('statRang').textContent = r.name;
+  G('statRangVal').textContent = r.name;
 
   var b1mode = p.box1Mode || 'streak';
   var b1 = G('statBox1Val');
@@ -401,6 +402,47 @@ function showRankModal(title, msg) {
   G('modalTitle').textContent = title;
   G('modalMsg').textContent   = msg;
   show('modal');
+}
+
+function renderRankList() {
+  var p = loadP();
+  var currentIdx = RANKS.indexOf(getRank(p.streak));
+  var displayIdx = Math.max(currentIdx, p.highestRankIdx || 0);
+  var list = G('rankList');
+  list.innerHTML = '';
+  for (var i = 0; i < RANKS.length; i++) {
+    var r = RANKS[i];
+    var row = document.createElement('div');
+    if (i === displayIdx) {
+      row.className = 'rank-row current';
+      var name = document.createElement('div');
+      name.className = 'rank-name';
+      name.textContent = r.name;
+      var body = document.createElement('div');
+      body.className = 'rank-body';
+      var ph = document.createElement('div');
+      ph.className = 'rank-img-ph';
+      ph.textContent = '🂠';
+      var msg = document.createElement('div');
+      msg.className = 'rank-msg';
+      msg.textContent = RANK_MSGS[r.name] || '';
+      body.appendChild(ph);
+      body.appendChild(msg);
+      row.appendChild(name);
+      row.appendChild(body);
+    } else {
+      row.className = 'rank-row ' + (i < displayIdx ? 'done' : 'upcoming');
+      var label = document.createElement('span');
+      label.className = 'rank-label';
+      label.textContent = r.name;
+      var thr = document.createElement('span');
+      thr.className = 'rank-threshold';
+      thr.textContent = 'ab ' + r.min;
+      row.appendChild(label);
+      row.appendChild(thr);
+    }
+    list.appendChild(row);
+  }
 }
 
 function renderTable() {
@@ -574,6 +616,8 @@ function setDiff(d) {
 
 G('btnSettings').addEventListener('click', openSettings);
 G('btnSettingsClose').addEventListener('click', function(){ hide('settingsOverlay'); });
+G('statRang').addEventListener('click', function(){ renderRankList(); show('rankOverlay'); });
+G('btnRankClose').addEventListener('click', function(){ hide('rankOverlay'); });
 G('diffEasy').addEventListener('click',   function(){ setDiff('easy'); });
 G('diffNormal').addEventListener('click', function(){ setDiff('normal'); });
 G('diffHard').addEventListener('click',   function(){ setDiff('hard'); });
