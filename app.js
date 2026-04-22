@@ -1,5 +1,5 @@
 /* ============================================================
-   SKAT TRAINER v3.0.1
+   SKAT TRAINER v3.1.0
    Änderungen ggü. v2.3:
    - Persistenter Rang: einmal erreichte Ränge bleiben erhalten,
      auch wenn der Streak bricht. Nur Difficulty-Wechsel setzt zurück.
@@ -109,7 +109,7 @@ function defP() {
   return {streak:0,record:0,games:0,wins:0,
           history:[],lastWinDate:'',dayStreak:0,
           avgMode:10,onboardingSeen:false,difficulty:'normal',box1Mode:'streak',box2Mode:'today',
-          highestRankIdx:0};
+          highestRankIdx:0,theme:'default'};
 }
 function saveP(p) {
   try {
@@ -132,6 +132,89 @@ function loadH() {
 function saveH(on) {
   try { localStorage.setItem('skat_haptic', on ? 'on' : 'off'); } catch(e){}
 }
+
+/* ── Theme ─────────────────────────────────────────────── */
+var THEMES = ['default','casino'];
+
+var THEME_THUMBS = {
+  'default':
+    '<svg viewBox="0 0 100 64" xmlns="http://www.w3.org/2000/svg">'
+    + '<rect width="100" height="64" fill="#0a2e18"/>'
+    + '<rect x="0" y="0" width="100" height="42" fill="#0f4a29"/>'
+    + '<rect x="18" y="14" width="14" height="22" rx="2" fill="#fefefe" stroke="#c8b890"/>'
+    + '<rect x="43" y="14" width="14" height="22" rx="2" fill="#fefefe" stroke="#c8b890"/>'
+    + '<rect x="68" y="14" width="14" height="22" rx="2" fill="#fefefe" stroke="#c8b890"/>'
+    + '<rect x="0" y="54" width="100" height="4" fill="#c9a227"/>'
+    + '<text x="50" y="50" text-anchor="middle" font-family="serif" font-size="8" fill="#c9a227">grüner Tisch</text>'
+    + '</svg>',
+  'casino':
+    '<svg viewBox="0 0 100 64" xmlns="http://www.w3.org/2000/svg">'
+    + '<rect width="100" height="64" fill="#080808"/>'
+    + '<rect x="18" y="14" width="14" height="22" rx="2" fill="#f5f0e8" stroke="#c8b890"/>'
+    + '<rect x="43" y="14" width="14" height="22" rx="2" fill="#f5f0e8" stroke="#c8b890"/>'
+    + '<rect x="68" y="14" width="14" height="22" rx="2" fill="#f5f0e8" stroke="#c8b890"/>'
+    + '<rect x="0" y="54" width="100" height="4" fill="#c9a84c"/>'
+    + '<text x="50" y="50" text-anchor="middle" font-family="Georgia,serif" font-size="8" fill="#c9a84c" letter-spacing="1">elegantes Casino</text>'
+    + '</svg>'
+};
+
+function ensureThemeFontsLoaded(name) {
+  if (name !== 'casino') return;
+  if (document.getElementById('casino-fonts')) return;
+  var link = document.createElement('link');
+  link.id = 'casino-fonts';
+  link.rel = 'stylesheet';
+  link.href = 'https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=IM+Fell+English&display=swap';
+  document.head.appendChild(link);
+}
+
+function applyTheme(name) {
+  if (THEMES.indexOf(name) < 0) name = 'default';
+  document.documentElement.setAttribute('data-theme', name);
+  ensureThemeFontsLoaded(name);
+}
+
+function setTheme(name) {
+  applyTheme(name);
+  var p = loadP(); p.theme = name; saveP(p);
+  updateThemeButtons(name);
+  haptic(10);
+}
+
+function updateThemeButtons(active) {
+  for (var i = 0; i < THEMES.length; i++) {
+    var k = THEMES[i];
+    var cap = k.charAt(0).toUpperCase() + k.slice(1);
+    var card  = document.getElementById('theme' + cap);
+    var state = document.getElementById('themeState' + cap);
+    if (!card || !state) continue;
+    if (k === active) {
+      card.classList.add('theme-card--active');
+      state.textContent = '● Aktiv';
+    } else {
+      card.classList.remove('theme-card--active');
+      state.textContent = '○ Wählen';
+    }
+  }
+}
+
+function injectThemeThumbs() {
+  for (var i = 0; i < THEMES.length; i++) {
+    var k = THEMES[i];
+    var cap = k.charAt(0).toUpperCase() + k.slice(1);
+    var slot = document.getElementById('themeThumb' + cap);
+    if (slot) slot.innerHTML = THEME_THUMBS[k];
+  }
+}
+
+(function initTheme(){
+  try {
+    var p = loadP();
+    applyTheme(p.theme || 'default');
+  } catch (e) {
+    applyTheme('default');
+  }
+})();
 function haptic(pattern) {
   try {
     if(loadH() && typeof navigator!=='undefined' && navigator.vibrate)
@@ -596,6 +679,7 @@ function openSettings() {
   G(d==='easy'?'diffEasy':d==='hard'?'diffHard':'diffNormal').classList.add('active');
   G('diffDesc').textContent=DIFF_DESCS[d];
   G('hapticToggle').checked = loadH();
+  updateThemeButtons(p.theme || 'default');
   hide('resetConfirm');
   show('settingsOverlay');
 }
@@ -618,6 +702,9 @@ G('btnSettings').addEventListener('click', openSettings);
 G('btnSettingsClose').addEventListener('click', function(){ hide('settingsOverlay'); });
 G('statRang').addEventListener('click', function(){ renderRankList(); show('rankOverlay'); });
 G('btnRankClose').addEventListener('click', function(){ hide('rankOverlay'); });
+G('themeDefault').addEventListener('click', function(){ setTheme('default'); });
+G('themeCasino').addEventListener('click',  function(){ setTheme('casino');  });
+injectThemeThumbs();
 G('diffEasy').addEventListener('click',   function(){ setDiff('easy'); });
 G('diffNormal').addEventListener('click', function(){ setDiff('normal'); });
 G('diffHard').addEventListener('click',   function(){ setDiff('hard'); });
