@@ -7,8 +7,9 @@
   --bg-secondary:     #0a2e18;
   --bg-sunken:        #061a0e;
   --bg-accent-glow:   #1d6b42;
-  --surface-subtle:   #ffffff0a;
+  --surface-subtle:   #ffffff14;
   --surface-raised:   #ffffff12;
+  --surface-tile:     #ffffff14;
   --surface-hover:    #ffffff24;
   --surface-active:   #ffffff38;
   --surface-emphasis: #ffffff61;
@@ -96,8 +97,9 @@
   --bg-secondary:     #0c0c0c;
   --bg-sunken:        #07060a;
   --bg-accent-glow:   #1a1408;
-  --surface-subtle:   #ffffff05;
-  --surface-raised:   #ffffff08;
+  --surface-subtle:   #ffffff0f;
+  --surface-raised:   #c9a84c33;
+  --surface-tile:     #c9a84c14;
   --surface-hover:    #ffffff14;
   --surface-active:   #ffffff24;
   --surface-emphasis: #ffffff4d;
@@ -110,7 +112,7 @@
   --accent:           #c9a84c;
   --accent-strong:    #e0ba50;
   --accent-highlight: var(--accent-highlight);
-  --accent-dim:       #5a4a28;
+  --accent-dim:       #c9a84c40;
   --accent-glow:      #e0ba5059;
   --card-gloss-hi:    #fffdf7;
   --card-gloss-lo:    #f5f0e2;
@@ -118,11 +120,11 @@
   --suit-red-text:    #c0392b;
   --text-on-dark:     #080808;
   --text-on-danger:   #ffffff;
-  --version-tag:      #3a3020;
+  --version-tag:      #8a7a4a;
 
   --text-primary:     #f5f0e8;
-  --text-secondary:   #7a6030;
-  --text-muted:       #3a3020;
+  --text-secondary:   #b89a5a;
+  --text-muted:       #8a7a4a;
 
   --card-bg:          #f5f0e8;
   --card-border:      #c8b890;
@@ -132,8 +134,15 @@
   --btn-primary-bg:       #c9a84c;
   --btn-primary-text:     #080808;
   --btn-secondary-bg:     #0c0c0c;
-  --btn-secondary-text:   #7a6030;
+  --btn-secondary-text:   #b89a5a;
 
+  --arrow-active:     #e0ba50;
+  --arrow-glow:       #e0ba5099;
+
+  --shadow-soft:      #00000080;
+  --shadow-medium:    #000000b3;
+  --shadow-strong:    #000000cc;
+  --shadow-deep:      #000000d9;
   --overlay-backdrop: #000000eb;
 
   --flame-color:      var(--flame-color);
@@ -525,7 +534,7 @@ body {
   flex-direction: column;
   align-items: center;
   gap: 6px;
-  background: var(--surface-subtle);
+  background: var(--surface-tile);
   border-radius: 8px;
   padding: 8px 6px 7px;
 }
