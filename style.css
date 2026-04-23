@@ -104,10 +104,10 @@
   --surface-active:   #ffffff24;
   --surface-emphasis: #ffffff4d;
 
-  --border-color:     #2a2010;
-  --border-subtle:    #1a1508;
+  --border-color:     #c9a84c40;
+  --border-subtle:    #c9a84c1f;
   --border-accent:    #c9a84c59;
-  --border-soft:      #2a2010;
+  --border-soft:      #c9a84c26;
 
   --accent:           #c9a84c;
   --accent-strong:    #e0ba50;
@@ -123,8 +123,8 @@
   --version-tag:      #8a7a4a;
 
   --text-primary:     #f5f0e8;
-  --text-secondary:   #b89a5a;
-  --text-muted:       #8a7a4a;
+  --text-secondary:   #d4b878;
+  --text-muted:       #aa9460;
 
   --card-bg:          #f5f0e8;
   --card-border:      #c8b890;
@@ -153,10 +153,6 @@
   --bg-weave-b:       #0c0c0c;
   --bg-noise:         url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='6' height='6'%3E%3Ccircle cx='1' cy='1' r='.6' fill='%23ffffff' fill-opacity='.015'/%3E%3C/svg%3E");
 
-  --font-display:           'Cinzel', Georgia, serif;
-  --font-body:              'IM Fell English', Georgia, serif;
-  --letter-spacing-title:   0.12em;
-  --letter-spacing-label:   0.2em;
 }
 
 *,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
