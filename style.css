@@ -58,7 +58,7 @@
   --color-err-dim:    #e74c3c33;
   --color-err-deep:   #c0392ba6;
   --color-warn:       #e85858;
-  --arrow-active:     var(--arrow-active);
+  --arrow-active:     #c9a227;
   --arrow-glow:       #ff505099;
 
   /* Shadow & Overlay */
@@ -621,7 +621,7 @@ body {
 }
 .side-arrow {
   font-size: .75rem;
-  color: var(--surface-active);
+  color: var(--text-muted);
   transition: color .3s, transform .3s;
   flex-shrink: 0;
 }
@@ -631,7 +631,7 @@ body {
   font-weight: 700;
   letter-spacing: 2px;
   text-transform: uppercase;
-  color: var(--surface-active);
+  color: var(--text-muted);
   transition: color .3s;
   white-space: nowrap;
   line-height: 1;
@@ -650,8 +650,8 @@ body {
 
 .tischmitte-wrap { flex:1; display:flex; flex-direction:column; align-items:center; gap:8px; }
 .tischmitte { display:flex; justify-content:center; gap:10px; flex-wrap:wrap; min-height:88px; align-items:center; perspective:600px; }
-.tisch-hint { color:var(--surface-active); font-size:.78rem; font-style:italic; text-align:center; line-height:1.5; }
-.tisch-hint strong { font-style:normal; color:var(--surface-emphasis); }
+.tisch-hint { color:var(--text-muted); font-size:.78rem; font-style:italic; text-align:center; line-height:1.5; }
+.tisch-hint strong { font-style:normal; color:var(--text-secondary); }
 .round-display { font-size:.7rem; color:var(--text-muted); letter-spacing:1.5px; text-transform:uppercase; min-height:16px; }
 
 /* ── Playing cards ───────────────────────────────────────── */
