@@ -620,83 +620,47 @@ body {
     inset -40px 0 60px -30px var(--arrow-glow);
 }
 
-/* ── Glow modifier classes (V1/V2/V3 mockup) ─────────── */
-@keyframes glowBreath {
-  0%, 100% {
-    box-shadow:
-      inset 0 0 40px var(--shadow-medium),
-      0 4px 20px var(--shadow-medium),
-      0 0 12px 2px var(--glow-color-soft),
-      0 0 0 1px var(--glow-color-soft);
-  }
-  50% {
-    box-shadow:
-      inset 0 0 40px var(--shadow-medium),
-      0 4px 20px var(--shadow-medium),
-      0 0 28px 8px var(--glow-color-soft),
-      0 0 0 1px var(--glow-color);
-  }
+/* ── Glow mockup classes (inset, directional) ────────── */
+/* V1: Ähnlich wie aktuell — mittlere Reichweite, weiches Blur */
+.game-table.gmt-v1.from-left {
+  box-shadow:
+    inset 0 0 40px var(--shadow-medium),
+    0 4px 20px var(--shadow-medium),
+    inset 50px 0 80px -20px var(--glow-color);
 }
-.game-table.glow-v1 {
-  animation: glowBreath 3s ease-in-out infinite;
+.game-table.gmt-v1.from-right {
+  box-shadow:
+    inset 0 0 40px var(--shadow-medium),
+    0 4px 20px var(--shadow-medium),
+    inset -50px 0 80px -20px var(--glow-color);
 }
-
-@keyframes glowNeon {
-  0%, 100% {
-    box-shadow:
-      inset 0 0 40px var(--shadow-medium),
-      0 4px 20px var(--shadow-medium),
-      0 0 0 1px var(--glow-color-hard),
-      0 0 6px 2px var(--glow-color),
-      0 0 18px 6px var(--arrow-glow),
-      0 0 35px 10px var(--glow-color-soft);
-  }
-  50% {
-    box-shadow:
-      inset 0 0 40px var(--shadow-medium),
-      0 4px 20px var(--shadow-medium),
-      0 0 0 2px var(--glow-color-hard),
-      0 0 10px 4px var(--glow-color),
-      0 0 28px 10px var(--arrow-glow),
-      0 0 52px 16px var(--glow-color-soft);
-  }
+/* V2: Kompakt & hell — enger Strahl, harte Farbe */
+.game-table.gmt-v2.from-left {
+  box-shadow:
+    inset 0 0 40px var(--shadow-medium),
+    0 4px 20px var(--shadow-medium),
+    inset 20px 0 35px -15px var(--glow-color-hard);
 }
-.game-table.glow-v2 {
-  animation: glowNeon 1.4s ease-in-out infinite;
+.game-table.gmt-v2.from-right {
+  box-shadow:
+    inset 0 0 40px var(--shadow-medium),
+    0 4px 20px var(--shadow-medium),
+    inset -20px 0 35px -15px var(--glow-color-hard);
 }
-
-@keyframes glowAmbient {
-  0% {
-    box-shadow:
-      inset 0 0 40px var(--shadow-medium),
-      0 4px 20px var(--shadow-medium),
-      0 0 60px 20px var(--glow-color-soft),
-      0 8px 80px 30px var(--glow-color-soft);
-  }
-  40% {
-    box-shadow:
-      inset 0 0 40px var(--shadow-medium),
-      0 4px 20px var(--shadow-medium),
-      0 0 80px 30px var(--glow-color-soft),
-      -4px 12px 100px 40px var(--glow-color-soft);
-  }
-  70% {
-    box-shadow:
-      inset 0 0 40px var(--shadow-medium),
-      0 4px 20px var(--shadow-medium),
-      0 0 70px 25px var(--glow-color-soft),
-      4px 6px 90px 35px var(--glow-color-soft);
-  }
-  100% {
-    box-shadow:
-      inset 0 0 40px var(--shadow-medium),
-      0 4px 20px var(--shadow-medium),
-      0 0 60px 20px var(--glow-color-soft),
-      0 8px 80px 30px var(--glow-color-soft);
-  }
+/* V3: Große Flut — zwei Schichten, breite Abdeckung */
+.game-table.gmt-v3.from-left {
+  box-shadow:
+    inset 0 0 40px var(--shadow-medium),
+    0 4px 20px var(--shadow-medium),
+    inset 80px 0 120px 10px var(--glow-color-soft),
+    inset 30px 0 50px -20px var(--glow-color);
 }
-.game-table.glow-v3 {
-  animation: glowAmbient 5s ease-in-out infinite;
+.game-table.gmt-v3.from-right {
+  box-shadow:
+    inset 0 0 40px var(--shadow-medium),
+    0 4px 20px var(--shadow-medium),
+    inset -80px 0 120px 10px var(--glow-color-soft),
+    inset -30px 0 50px -20px var(--glow-color);
 }
 
 /* ── Side indicators ─────────────────────────────────── */
@@ -1320,24 +1284,30 @@ body {
   overflow: hidden;
   border-radius: 8px;
 }
-.gmp-cell:has(.glow-v3) { overflow: visible; }
 .gmp-fake-table {
   min-height: 80px !important;
-  padding: 12px 8px !important;
+  padding: 8px !important;
   display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
+  align-items: stretch !important;
+  justify-content: space-between !important;
   cursor: default;
+  gap: 4px !important;
 }
-.gmp-inner-label {
-  font-family: var(--font-display);
-  font-size: .7rem;
-  font-weight: 700;
+.gmp-indicator {
+  width: 20px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: .65rem;
   color: var(--text-muted);
-  letter-spacing: 3px;
-  text-transform: uppercase;
-  opacity: .55;
+  transition: color .3s, filter .3s;
 }
+.gmp-indicator.active {
+  color: var(--arrow-active);
+  filter: drop-shadow(0 0 6px var(--arrow-glow));
+}
+.gmp-spacer { flex: 1; }
 @media (max-width: 480px) {
   .gmp-col-labels, .gmp-row { grid-template-columns: 1fr; }
   .gmp-col-labels { display: none; }
