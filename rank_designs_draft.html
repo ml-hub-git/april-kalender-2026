@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rang-Bilder Entwurf — Skattrainer3000</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Lato:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #111; color: #f0ead6; font-family: Lato, sans-serif;
+      padding: 28px 16px 56px; min-height: 100vh;
+    }
+    h1 {
+      font-family: 'Playfair Display', serif; color: #c9a227;
+      text-align: center; font-size: 1.6rem; margin-bottom: 6px;
+    }
+    .subtitle { text-align: center; color: #98906e; font-size: .78rem; margin-bottom: 36px; }
+
+    .section-title {
+      font-family: 'Playfair Display', serif; color: #c9a22780;
+      font-size: .72rem; letter-spacing: 2.5px; text-transform: uppercase;
+      margin: 40px 0 14px; border-bottom: 1px solid #c9a22728; padding-bottom: 6px;
+      max-width: 680px; margin-left: auto; margin-right: auto;
+    }
+
+    /* ── Badge-Grid (80 × 80) ─────────────────────────────── */
+    .badge-grid {
+      display: flex; flex-wrap: wrap; gap: 16px;
+      justify-content: center; max-width: 680px; margin: 0 auto;
+    }
+    .badge-card {
+      background: #1a1a1a; border: 1px solid #c9a22728; border-radius: 12px;
+      padding: 14px 12px 12px; text-align: center; width: 136px;
+    }
+    .badge-card svg { display: block; margin: 0 auto; }
+    .badge-card .rn {
+      font-family: 'Playfair Display', serif; font-size: .76rem;
+      color: #c9a227; margin-top: 9px; margin-bottom: 3px; line-height: 1.35;
+    }
+    .badge-card .rm { font-size: .62rem; color: #98906e; letter-spacing: .8px; }
+    .badge-card .rtxt {
+      font-size: .6rem; color: #c8b890; font-style: italic;
+      margin-top: 6px; line-height: 1.5;
+    }
+
+    /* ── Rank-List-Simulation ─────────────────────────────── */
+    .rank-list-sim {
+      background: #1a1a1a; border: 1px solid #c9a22728; border-radius: 12px;
+      padding: 10px 12px; max-width: 340px; margin: 0 auto;
+    }
+    .rank-row-sim {
+      display: flex; align-items: center; gap: 8px;
+      padding: 5px 8px; border-radius: 6px;
+      font-size: .82rem; color: #98906e;
+    }
+    .rank-row-sim svg { flex-shrink: 0; display: block; }
+    .rank-row-sim.done { color: #f0ead6; }
+    .rank-row-sim.upcoming { opacity: .48; }
+    .rank-row-sim.current {
+      background: #c9a2271f; border: 1px solid #c9a2274d;
+      color: #c9a227; margin: 3px 0; padding: 6px 10px;
+    }
+    .rl-label { flex: 1; }
+    .rl-thr { font-size: .65rem; color: #98906e; }
+
+    .note {
+      max-width: 500px; margin: 28px auto 0; font-size: .72rem;
+      color: #98906e; line-height: 1.7; text-align: center;
+      background: #c9a2270a; border-radius: 8px; padding: 10px 16px;
+      border: 1px solid #c9a22720;
+    }
+  </style>
+</head>
+<body>
+
+<h1>🏅 Rang-Bilder Entwurf</h1>
+<p class="subtitle">Skattrainer3000 · Design-Entwurf v3.2 · 7 Ränge · Spielkarten-Badge-Stil</p>
+
+<!-- ═══════════════════════════════════════════════════════════
+     ABSCHNITT 1 — Badges groß (80 × 80 px), aktueller Rang
+     ═══════════════════════════════════════════════════════════ -->
+<div class="section-title">Badges (80 × 80 px) · aktueller Rang</div>
+<div class="badge-grid">
+
+  <!-- ── 0: Anfänger ──────────────────────────────────────── -->
+  <div class="badge-card">
+    <svg viewBox="0 0 80 80" width="80" height="80" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <clipPath id="cl0">
+          <rect x="7" y="7" width="66" height="66" rx="7"/>
+        </clipPath>
+      </defs>
+      <rect x="3" y="3" width="74" height="74" rx="10" fill="#1e1e1e" stroke="#555" stroke-width="1.8"/>
+      <rect x="7" y="7" width="66" height="66" rx="7" fill="#232323"/>
+      <!-- Kartenrücken-Diagonalen -->
+      <g clip-path="url(#cl0)" stroke="#4a4a4a" stroke-width="1.3" opacity="0.6">
+        <line x1="7" y1="73" x2="73" y2="7"/>
+        <line x1="7" y1="53" x2="53" y2="7"/>
+        <line x1="7" y1="33" x2="33" y2="7"/>
+        <line x1="27" y1="73" x2="73" y2="27"/>
+        <line x1="47" y1="73" x2="73" y2="47"/>
+      </g>
+      <!-- "?" -->
+      <text x="40" y="44" text-anchor="middle" dominant-baseline="middle"
+            font-size="36" fill="#666" font-family="Playfair Display,serif" font-weight="700">?</text>
+      <text x="40" y="68" text-anchor="middle" dominant-baseline="middle"
+            font-size="8" fill="#484848" font-family="Lato,sans-serif" letter-spacing="1">ab 0</text>
+    </svg>
+    <div class="rn">Anfänger</div>
+    <div class="rm">ab 0 Siegen</div>
+    <div class="rtxt">Jede Skat-Karriere beginnt hier. Dein erster perfekter Sieg wartet.</div>
+  </div>
+
+  <!-- ── 1: Skat-Bauer ────────────────────────────────────── -->
+  <div class="badge-card">
+    <svg viewBox="0 0 80 80" width="80" height="80" xmlns="http://www.w3.org/2000/svg">
+      <rect x="3" y="3" width="74" height="74" rx="10" fill="#200e04" stroke="#8B4513" stroke-width="1.8"/>
+      <rect x="7" y="7" width="66" height="66" rx="7" fill="#2c1408"/>
+      <!-- Mini Spielkarte -->
+      <rect x="20" y="13" width="40" height="54" rx="5" fill="#321808" stroke="#c4721a" stroke-width="1.3"/>
+      <!-- Eckbeschriftung oben-links -->
+      <text x="28" y="24" text-anchor="middle" dominant-baseline="middle"
+            font-size="10" fill="#c4721a" font-family="Playfair Display,serif" font-weight="700">B</text>
+      <text x="28" y="34" text-anchor="middle" dominant-baseline="middle"
+            font-size="9" fill="#c4721a" font-family="Lato,sans-serif">♦</text>
+      <!-- Großes ♦ in Kartenmitte -->
+      <text x="40" y="50" text-anchor="middle" dominant-baseline="middle"
+            font-size="24" fill="#c4721a" font-family="Lato,sans-serif">♦</text>
+      <!-- Eckbeschriftung unten-rechts (gedreht) -->
+      <text x="52" y="61" text-anchor="middle" dominant-baseline="middle"
+            font-size="10" fill="#c4721a" font-family="Playfair Display,serif" font-weight="700"
+            transform="rotate(180,52,61)">B</text>
+    </svg>
+    <div class="rn">Skat-Bauer</div>
+    <div class="rm">ab 1 Sieg</div>
+    <div class="rtxt">Herzlichen Glückwunsch! Dein erster perfekter Sieg!</div>
+  </div>
+
+  <!-- ── 2: Kneipen-Dübler ────────────────────────────────── -->
+  <div class="badge-card">
+    <svg viewBox="0 0 80 80" width="80" height="80" xmlns="http://www.w3.org/2000/svg">
+      <rect x="3" y="3" width="74" height="74" rx="10" fill="#1c1700" stroke="#c9a227" stroke-width="1.8"/>
+      <rect x="7" y="7" width="66" height="66" rx="7" fill="#231e04"/>
+      <!-- Bierkrug-Körper -->
+      <rect x="21" y="22" width="28" height="32" rx="4" fill="none" stroke="#e0ba50" stroke-width="2.5"/>
+      <!-- Henkel -->
+      <path d="M49 27 Q61 27 61 38 Q61 49 49 49"
+            fill="none" stroke="#e0ba50" stroke-width="2.5" stroke-linecap="round"/>
+      <!-- Schaum (3 Kreise) -->
+      <ellipse cx="26" cy="22" rx="6" ry="5" fill="#e0ba50" opacity="0.88"/>
+      <ellipse cx="35" cy="20" rx="7.5" ry="5.5" fill="#e0ba50" opacity="0.95"/>
+      <ellipse cx="44" cy="22" rx="6" ry="5" fill="#e0ba50" opacity="0.88"/>
+      <!-- "6×" -->
+      <text x="40" y="67" text-anchor="middle" dominant-baseline="middle"
+            font-size="11" fill="#c9a227" font-family="Lato,sans-serif" font-weight="700" letter-spacing="2">6 ×</text>
+    </svg>
+    <div class="rn">Kneipen-Dübler</div>
+    <div class="rm">ab 6 in Folge</div>
+    <div class="rtxt">Wow… 6 mal 100 % hintereinander… Bleib dran!</div>
+  </div>
+
+  <!-- ── 3: Kreuz-Bube ────────────────────────────────────── -->
+  <div class="badge-card">
+    <svg viewBox="0 0 80 80" width="80" height="80" xmlns="http://www.w3.org/2000/svg">
+      <rect x="3" y="3" width="74" height="74" rx="10" fill="#041804" stroke="#2d7a2d" stroke-width="1.8"/>
+      <rect x="7" y="7" width="66" height="66" rx="7" fill="#081e08"/>
+      <!-- Großes ♣ -->
+      <text x="40" y="43" text-anchor="middle" dominant-baseline="middle"
+            font-size="42" fill="#4aae4a" font-family="Lato,sans-serif">♣</text>
+      <!-- "BUBE" -->
+      <text x="40" y="68" text-anchor="middle" dominant-baseline="middle"
+            font-size="9.5" fill="#2d7a2d" font-family="Playfair Display,serif" font-weight="700" letter-spacing="3">BUBE</text>
+    </svg>
+    <div class="rn">Kreuz-Bube</div>
+    <div class="rm">ab 12 in Folge</div>
+    <div class="rtxt">Ein Drittel eines Spiels am Stück perfekt.</div>
+  </div>
+
+  <!-- ── 4: Skat-Meister ──────────────────────────────────── -->
+  <div class="badge-card">
+    <svg viewBox="0 0 80 80" width="80" height="80" xmlns="http://www.w3.org/2000/svg">
+      <rect x="3" y="3" width="74" height="74" rx="10" fill="#040f1e" stroke="#5b8fb9" stroke-width="1.8"/>
+      <rect x="7" y="7" width="66" height="66" rx="7" fill="#07111e"/>
+      <!-- Pokal-Körper -->
+      <path d="M27 18 L53 18 L50 40 Q50 48 40 50 Q30 48 30 40 Z"
+            fill="#8ab4d4" opacity="0.85"/>
+      <!-- Pokal-Stiel + Sockel -->
+      <rect x="37" y="50" width="6" height="9" rx="1" fill="#8ab4d4" opacity="0.85"/>
+      <rect x="29" y="59" width="22" height="6" rx="2" fill="#8ab4d4" opacity="0.85"/>
+      <!-- Griffe links und rechts -->
+      <path d="M27 22 Q17 22 17 33 Q17 40 27 40"
+            fill="none" stroke="#8ab4d4" stroke-width="2.5" stroke-linecap="round" opacity="0.8"/>
+      <path d="M53 22 Q63 22 63 33 Q63 40 53 40"
+            fill="none" stroke="#8ab4d4" stroke-width="2.5" stroke-linecap="round" opacity="0.8"/>
+      <!-- Highlight-Linie im Pokal -->
+      <line x1="34" y1="24" x2="33" y2="38" stroke="#c8dcec" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/>
+    </svg>
+    <div class="rn">Skat-Meister</div>
+    <div class="rm">ab 36 in Folge</div>
+    <div class="rtxt">Ein ganzes Spiel am Stück perfekt! Dies war erst der Anfang…</div>
+  </div>
+
+  <!-- ── 5: Skat-Großmeister ──────────────────────────────── -->
+  <div class="badge-card">
+    <svg viewBox="0 0 80 80" width="80" height="80" xmlns="http://www.w3.org/2000/svg">
+      <rect x="3" y="3" width="74" height="74" rx="10" fill="#1c1400" stroke="#d4a017" stroke-width="1.8"/>
+      <rect x="7" y="7" width="66" height="66" rx="7" fill="#241a00"/>
+      <!-- 8 Strahlen -->
+      <g stroke="#ffd700" stroke-linecap="round" opacity="0.45">
+        <line x1="40" y1="10" x2="40" y2="21" stroke-width="3"/>
+        <line x1="40" y1="59" x2="40" y2="70" stroke-width="3"/>
+        <line x1="10" y1="40" x2="21" y2="40" stroke-width="3"/>
+        <line x1="59" y1="40" x2="70" y2="40" stroke-width="3"/>
+        <line x1="18" y1="18" x2="26" y2="26" stroke-width="2.2"/>
+        <line x1="54" y1="54" x2="62" y2="62" stroke-width="2.2"/>
+        <line x1="62" y1="18" x2="54" y2="26" stroke-width="2.2"/>
+        <line x1="18" y1="62" x2="26" y2="54" stroke-width="2.2"/>
+      </g>
+      <!-- 8-zackiger Stern -->
+      <polygon
+        points="40,20 43,32 54,26 48,37 60,40 48,43 54,54 43,48 40,60 37,48 26,54 32,43 20,40 32,37 26,26 37,32"
+        fill="#ffd700" opacity="0.92"/>
+    </svg>
+    <div class="rn">Skat-Großmeister</div>
+    <div class="rm">ab 72 in Folge</div>
+    <div class="rtxt">Skat-Großmeister! Die Karten verneigen sich vor dir.</div>
+  </div>
+
+  <!-- ── 6: König Skat der I. ─────────────────────────────── -->
+  <div class="badge-card">
+    <svg viewBox="0 0 80 80" width="80" height="80" xmlns="http://www.w3.org/2000/svg">
+      <rect x="3" y="3" width="74" height="74" rx="10" fill="#140820" stroke="#8040c0" stroke-width="1.8"/>
+      <rect x="7" y="7" width="66" height="66" rx="7" fill="#1c0e30"/>
+      <!-- Krone (3-zackig, klassisch) -->
+      <path d="M15,58 L15,40 L27,50 L40,22 L53,50 L65,40 L65,58 Z"
+            fill="#c090f0" opacity="0.9"/>
+      <!-- Kronensockel -->
+      <rect x="15" y="58" width="50" height="8" rx="3" fill="#c090f0" opacity="0.9"/>
+      <!-- Edelsteine auf den Zacken -->
+      <circle cx="27" cy="50" r="3.5" fill="#edddf5"/>
+      <circle cx="40" cy="28"  r="4.5" fill="#fff0ff"/>
+      <circle cx="53" cy="50" r="3.5" fill="#edddf5"/>
+      <!-- Zwei kleine Kronenperlen auf dem Sockel -->
+      <circle cx="31" cy="62" r="2.5" fill="#a060e0" opacity="0.7"/>
+      <circle cx="49" cy="62" r="2.5" fill="#a060e0" opacity="0.7"/>
+    </svg>
+    <div class="rn">König Skat der I.</div>
+    <div class="rm">ab 180 in Folge</div>
+    <div class="rtxt">Die Skatwelt liegt dir zu Füßen!</div>
+  </div>
+
+</div><!-- /badge-grid -->
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     ABSCHNITT 2 — Listenansicht mit kleinem Icon (32 × 32 px)
+     ═══════════════════════════════════════════════════════════ -->
+<div class="section-title">Listenansicht · kleines Icon (32 × 32 px) · Beispiel: aktueller Rang = Kreuz-Bube</div>
+<div class="rank-list-sim">
+
+  <!-- done -->
+  <div class="rank-row-sim done">
+    <svg viewBox="0 0 80 80" width="32" height="32" xmlns="http://www.w3.org/2000/svg">
+      <defs><clipPath id="cl0b"><rect x="7" y="7" width="66" height="66" rx="7"/></clipPath></defs>
+      <rect x="3" y="3" width="74" height="74" rx="10" fill="#1e1e1e" stroke="#555" stroke-width="1.8"/>
+      <rect x="7" y="7" width="66" height="66" rx="7" fill="#232323"/>
+      <g clip-path="url(#cl0b)" stroke="#4a4a4a" stroke-width="1.3" opacity="0.6">
+        <line x1="7" y1="73" x2="73" y2="7"/>
+        <line x1="7" y1="53" x2="53" y2="7"/>
+        <line x1="27" y1="73" x2="73" y2="27"/>
+        <line x1="47" y1="73" x2="73" y2="47"/>
+      </g>
+      <text x="40" y="44" text-anchor="middle" dominant-baseline="middle"
+            font-size="36" fill="#666" font-family="Playfair Display,serif" font-weight="700">?</text>
+    </svg>
+    <span class="rl-label">Anfänger</span>
+    <span class="rl-thr">ab 0</span>
+  </div>
+
+  <div class="rank-row-sim done">
+    <svg viewBox="0 0 80 80" width="32" height="32" xmlns="http://www.w3.org/2000/svg">
+      <rect x="3" y="3" width="74" height="74" rx="10" fill="#200e04" stroke="#8B4513" stroke-width="1.8"/>
+      <rect x="7" y="7" width="66" height="66" rx="7" fill="#2c1408"/>
+      <rect x="20" y="13" width="40" height="54" rx="5" fill="#321808" stroke="#c4721a" stroke-width="1.3"/>
+      <text x="28" y="24" text-anchor="middle" dominant-baseline="middle"
+            font-size="10" fill="#c4721a" font-family="Playfair Display,serif" font-weight="700">B</text>
+      <text x="28" y="34" text-anchor="middle" dominant-baseline="middle"
+            font-size="9" fill="#c4721a" font-family="Lato,sans-serif">♦</text>
+      <text x="40" y="50" text-anchor="middle" dominant-baseline="middle"
+            font-size="24" fill="#c4721a" font-family="Lato,sans-serif">♦</text>
+      <text x="52" y="61" text-anchor="middle" dominant-baseline="middle"
+            font-size="10" fill="#c4721a" font-family="Playfair Display,serif" font-weight="700"
+            transform="rotate(180,52,61)">B</text>
+    </svg>
+    <span class="rl-label">Skat-Bauer</span>
+    <span class="rl-thr">ab 1</span>
+  </div>
+
+  <div class="rank-row-sim done">
+    <svg viewBox="0 0 80 80" width="32" height="32" xmlns="http://www.w3.org/2000/svg">
+      <rect x="3" y="3" width="74" height="74" rx="10" fill="#1c1700" stroke="#c9a227" stroke-width="1.8"/>
+      <rect x="7" y="7" width="66" height="66" rx="7" fill="#231e04"/>
+      <rect x="21" y="22" width="28" height="32" rx="4" fill="none" stroke="#e0ba50" stroke-width="2.5"/>
+      <path d="M49 27 Q61 27 61 38 Q61 49 49 49"
+            fill="none" stroke="#e0ba50" stroke-width="2.5" stroke-linecap="round"/>
+      <ellipse cx="26" cy="22" rx="6" ry="5" fill="#e0ba50" opacity="0.88"/>
+      <ellipse cx="35" cy="20" rx="7.5" ry="5.5" fill="#e0ba50" opacity="0.95"/>
+      <ellipse cx="44" cy="22" rx="6" ry="5" fill="#e0ba50" opacity="0.88"/>
+    </svg>
+    <span class="rl-label">Kneipen-Dübler</span>
+    <span class="rl-thr">ab 6</span>
+  </div>
+
+  <!-- current -->
+  <div class="rank-row-sim current">
+    <svg viewBox="0 0 80 80" width="32" height="32" xmlns="http://www.w3.org/2000/svg">
+      <rect x="3" y="3" width="74" height="74" rx="10" fill="#041804" stroke="#2d7a2d" stroke-width="1.8"/>
+      <rect x="7" y="7" width="66" height="66" rx="7" fill="#081e08"/>
+      <text x="40" y="43" text-anchor="middle" dominant-baseline="middle"
+            font-size="42" fill="#4aae4a" font-family="Lato,sans-serif">♣</text>
+    </svg>
+    <span class="rl-label"><strong>Kreuz-Bube</strong> · aktuell</span>
+    <span class="rl-thr">ab 12</span>
+  </div>
+
+  <!-- upcoming -->
+  <div class="rank-row-sim upcoming">
+    <svg viewBox="0 0 80 80" width="32" height="32" xmlns="http://www.w3.org/2000/svg">
+      <rect x="3" y="3" width="74" height="74" rx="10" fill="#040f1e" stroke="#5b8fb9" stroke-width="1.8"/>
+      <rect x="7" y="7" width="66" height="66" rx="7" fill="#07111e"/>
+      <path d="M27 18 L53 18 L50 40 Q50 48 40 50 Q30 48 30 40 Z" fill="#8ab4d4" opacity="0.85"/>
+      <rect x="37" y="50" width="6" height="9" rx="1" fill="#8ab4d4" opacity="0.85"/>
+      <rect x="29" y="59" width="22" height="6" rx="2" fill="#8ab4d4" opacity="0.85"/>
+      <path d="M27 22 Q17 22 17 33 Q17 40 27 40"
+            fill="none" stroke="#8ab4d4" stroke-width="2.5" stroke-linecap="round" opacity="0.8"/>
+      <path d="M53 22 Q63 22 63 33 Q63 40 53 40"
+            fill="none" stroke="#8ab4d4" stroke-width="2.5" stroke-linecap="round" opacity="0.8"/>
+    </svg>
+    <span class="rl-label">Skat-Meister</span>
+    <span class="rl-thr">ab 36</span>
+  </div>
+
+  <div class="rank-row-sim upcoming">
+    <svg viewBox="0 0 80 80" width="32" height="32" xmlns="http://www.w3.org/2000/svg">
+      <rect x="3" y="3" width="74" height="74" rx="10" fill="#1c1400" stroke="#d4a017" stroke-width="1.8"/>
+      <rect x="7" y="7" width="66" height="66" rx="7" fill="#241a00"/>
+      <g stroke="#ffd700" stroke-linecap="round" opacity="0.45">
+        <line x1="40" y1="10" x2="40" y2="21" stroke-width="3"/>
+        <line x1="40" y1="59" x2="40" y2="70" stroke-width="3"/>
+        <line x1="10" y1="40" x2="21" y2="40" stroke-width="3"/>
+        <line x1="59" y1="40" x2="70" y2="40" stroke-width="3"/>
+        <line x1="18" y1="18" x2="26" y2="26" stroke-width="2.2"/>
+        <line x1="54" y1="54" x2="62" y2="62" stroke-width="2.2"/>
+        <line x1="62" y1="18" x2="54" y2="26" stroke-width="2.2"/>
+        <line x1="18" y1="62" x2="26" y2="54" stroke-width="2.2"/>
+      </g>
+      <polygon
+        points="40,20 43,32 54,26 48,37 60,40 48,43 54,54 43,48 40,60 37,48 26,54 32,43 20,40 32,37 26,26 37,32"
+        fill="#ffd700" opacity="0.92"/>
+    </svg>
+    <span class="rl-label">Skat-Großmeister</span>
+    <span class="rl-thr">ab 72</span>
+  </div>
+
+  <div class="rank-row-sim upcoming">
+    <svg viewBox="0 0 80 80" width="32" height="32" xmlns="http://www.w3.org/2000/svg">
+      <rect x="3" y="3" width="74" height="74" rx="10" fill="#140820" stroke="#8040c0" stroke-width="1.8"/>
+      <rect x="7" y="7" width="66" height="66" rx="7" fill="#1c0e30"/>
+      <path d="M15,58 L15,40 L27,50 L40,22 L53,50 L65,40 L65,58 Z" fill="#c090f0" opacity="0.9"/>
+      <rect x="15" y="58" width="50" height="8" rx="3" fill="#c090f0" opacity="0.9"/>
+      <circle cx="27" cy="50" r="3.5" fill="#edddf5"/>
+      <circle cx="40" cy="28"  r="4.5" fill="#fff0ff"/>
+      <circle cx="53" cy="50" r="3.5" fill="#edddf5"/>
+    </svg>
+    <span class="rl-label">König Skat der I.</span>
+    <span class="rl-thr">ab 180</span>
+  </div>
+
+</div><!-- /rank-list-sim -->
+
+<p class="note">
+  Alle Badges sind reine Inline-SVGs · kein Bild-Download · skaliert von 80 × 80 px (aktueller Rang) auf 32 × 32 px (Listenzeilen) über dasselbe <code>viewBox="0 0 80 80"</code>.
+  <br><br>
+  Farbprogression: Grau (Anfänger) → Braun (Bauer) → Amber (Kneipe) → Grün (Kreuz-Bube) → Stahlblau (Meister) → Gold (Großmeister) → Lila (König)
+</p>
+
+</body>
+</html>
