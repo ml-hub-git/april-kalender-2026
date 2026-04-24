@@ -1,5 +1,5 @@
 /* ============================================================
-   SKAT TRAINER v3.1.4
+   SKAT TRAINER v3.1.5
    Änderungen ggü. v2.3:
    - Persistenter Rang: einmal erreichte Ränge bleiben erhalten,
      auch wenn der Streak bricht. Nur Difficulty-Wechsel setzt zurück.
