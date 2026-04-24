@@ -77,6 +77,7 @@ Statische, mobile-first Web-App zum Trainieren des Skat-Kartenrechnens (Schätzu
 -
 
 ### Features (noch nicht beauftragt)
+- [ ] Bilder für die einzelnen Level des Fortschritts
 - [ ] Echte B/D/K-Kartengrafiken (me.uk/cards CC0 mit Index-Remap oder eigene SVGs)
 - [ ] PWA / Service Worker / Manifest / Homescreen-Installation
 - [ ] Konfetti als Meilenstein-Effekt (Rang-Aufstieg, neuer Rekord)
